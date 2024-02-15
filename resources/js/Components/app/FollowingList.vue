@@ -12,8 +12,8 @@ import GroupListItems from "@/Components/app/GroupListItems.vue";
                     <div class="flex justify-between items-center">
                         <h2 class="text-xl font-bold">My Followings</h2>
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                             stroke="currentColor" class="w-6 h-6 transition-all"
-                             :class="open ? 'rotate-90 transform' : ''">
+                            stroke="currentColor" class="w-6 h-6 transition-all"
+                            :class="open ? 'rotate-90 transform' : ''">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/>
                         </svg>
                     </div>
@@ -23,7 +23,7 @@ import GroupListItems from "@/Components/app/GroupListItems.vue";
                 </DisclosurePanel>
             </Disclosure>
         </div>
-        <div class="h-screen overflow-hidden flex-col hidden lg:flex">
+        <div class="h-full overflow-hidden flex-col hidden lg:flex">
             <h2 class="text-xl font-bold">My Followings</h2>
             <FollowingListItems/>
         </div>
