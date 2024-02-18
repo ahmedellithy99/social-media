@@ -26,5 +26,6 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::get('u/{user:username}' , [ProfileController::class , 'index'])->name('profile');
+Route::post('/updateImage' , [ProfileController::class , 'updateImage'])->name('update.image');
 
 require __DIR__.'/auth.php';
