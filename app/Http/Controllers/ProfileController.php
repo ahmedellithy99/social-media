@@ -23,17 +23,19 @@ class ProfileController extends Controller
 
         $data = $request->validate(
             [
-                'cover' => 'required|image' ,
-                'avatar' => 'nullable'
+                'cover' => 'nullable|image' ,
+                'avatar' => 'nullable|image'
             ]
             );
 
-        $cover = $data['cover'];
-        $avatar = $data['avatar'];
+        $cover = $data['cover'] ?? null ;
+        $avatar = $data['avatar'] ?? null;
+
+        $success = '';
 
         if($cover)
         {
-            $path = $cover->storePublicly('cover/'.$user->id , 'public');
+            $path = $cover->storePublicly('user/'.$user->id , 'public');
             
             
             if($user->cover_path)
@@ -42,14 +44,25 @@ class ProfileController extends Controller
             }
             
             $user->update(['cover_path' => $path]);
+            
+            $success = 'Your cover image was updated';
         }
 
-        return back()->with('status', 'cover-image-update');
+        if ($avatar) {
+            if ($user->avatar_path) {
+                Storage::disk('public')->delete($user->avatar_path);
+            }
+            $path = $avatar->store('user/'.$user->id, 'public');
+            $user->update(['avatar_path' => $path]);
+            $success = 'Your avatar image was updated';
+        }
+
+        return back()->with('success', $success);
     }
 
     public function index(User $user)
     {
-        return Inertia::render('Profile/View' , ['user' => new UserResource($user) , 'status' => session('status') ]);
+        return Inertia::render('Profile/View' , ['user' => new UserResource($user) , 'success' => session('success'), ]);
     }
 
     /**
