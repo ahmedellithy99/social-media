@@ -76,7 +76,7 @@ function submitCoverImage()
     
     <AuthenticatedLayout>
         
-
+        
         <div class="max-w-[768px] mx-auto h-full overflow-auto">
 
                 <div class="relative bg-white">
@@ -96,11 +96,14 @@ function submitCoverImage()
                         <img :src=" coverImageSrc || user.cover_url || '/img/default-cover.jpg'" class="w-full h-[200px] object-cover rounded " >
 
                         <div v-if="!coverImageSrc" class="absolute top-2 right-2"> 
-                            <button class="bg-gray-50 hover:bg-gray-100 text-gray-800 py-1 px-2 text-xs flex items-center opacity-0 group-hover:opacity-100 ">
-                                Update Cover
-                            </button>
-                            <input type="file" class="absolute top-0 left-0 right-0 bottom-0 opacity-0"
-                                @change="onCoverChange"/>
+                            <div v-if="authUser.id == user.id">
+
+                                <button class="bg-gray-50 hover:bg-gray-100 text-gray-800 py-1 px-2 text-xs flex items-center opacity-0 group-hover:opacity-100 ">
+                                    Update Cover
+                                </button>
+                                <input type="file" class="absolute top-0 left-0 right-0 bottom-0 opacity-0"
+                                    @change="onCoverChange"/>
+                            </div>
                         </div>  
 
                         <div v-else class="flex absolute top-2 right-2 gap-3 " >

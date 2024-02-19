@@ -10,6 +10,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -19,6 +20,7 @@ class ProfileController extends Controller
     {
         $user = $request->user();
         
+
         $data = $request->validate(
             [
                 'cover' => 'required|image' ,
@@ -32,6 +34,12 @@ class ProfileController extends Controller
         if($cover)
         {
             $path = $cover->storePublicly('cover/'.$user->id , 'public');
+            
+            
+            if($user->cover_path)
+            {   
+                Storage::disk('public')->delete($user->cover_path);
+            }
             
             $user->update(['cover_path' => $path]);
         }
