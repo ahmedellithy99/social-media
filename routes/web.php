@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\PostController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -23,9 +24,12 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    Route::post('/post' , [PostController::class , 'store'] )->name('post.store');
 });
 
 Route::get('u/{user:username}' , [ProfileController::class , 'index'])->name('profile');
 Route::post('/updateImage' , [ProfileController::class , 'updateImage'])->name('update.image');
+
 
 require __DIR__.'/auth.php';
