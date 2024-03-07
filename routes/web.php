@@ -26,6 +26,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     Route::post('/post' , [PostController::class , 'store'] )->name('post.store');
+    Route::put('/post/{post}' , [PostController::class , 'update'])->name('post.update');
 });
 
 Route::get('u/{user:username}' , [ProfileController::class , 'index'])->name('profile');

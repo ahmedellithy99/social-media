@@ -7,7 +7,7 @@ import PostList from "@/Components/app/PostList.vue";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 
 defineProps({
-    posts : String
+    posts : Object
 });
 
 </script>
