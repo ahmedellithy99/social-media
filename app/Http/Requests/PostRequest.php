@@ -31,7 +31,8 @@ class PostRequest extends FormRequest
     {
         // Add your custom key to the request data
         $this->merge([
-            'user_id' => auth()->user()->id,
+            'body' => $this->input('body') ?: '',
+            'user_id' => auth()->user()->id
         ]);
     }
 }
