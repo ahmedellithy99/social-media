@@ -38,7 +38,7 @@ function deletePost()
 
         <div class="flex items-center justify-between mb-3">
             <PostUserHeader :post="post"/>
-            <Menu as="div" class="relative inline-block text-left">
+            <Menu as="div" class="relative z-10  inline-block text-left">
                 <div>
                     <MenuButton
                         class="w-8 h-8 rounded-full hover:bg-black/5 transition flex items-center justify-center"
@@ -60,7 +60,7 @@ function deletePost()
                     leave-to-class="transform scale-95 opacity-0"
                 >
                     <MenuItems
-                        class="absolute right-0 mt-2 w-32 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black/5 focus:outline-none"
+                        class="absolute z-20 right-0 mt-2 w-32 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black/5 focus:outline-none"
                     >
                         <div class="px-1 py-1">
                             <MenuItem v-slot="{ active }">
@@ -119,7 +119,7 @@ function deletePost()
         ]">
             <template v-for="(attachment, ind) of post.attachments.slice(0, 4)">
                 <div class="group aspect-square bg-blue-100 flex flex-col items-center justify-center text-gray-500 relative">
-                    <div v-if="ind === 3"
+                    <div v-if="ind === 3 && post.attachments.length > 4"
                         class="absolute left-0 top-0 right-0 bottom-0 z-10 bg-black/60 text-white flex items-center justify-center text-2xl">
                         +{{ post.attachments.length - 4 }} more
                     </div>

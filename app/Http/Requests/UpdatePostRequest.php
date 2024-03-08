@@ -3,15 +3,18 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
 
-class UpdatePostRequest extends FormRequest
+class UpdatePostRequest extends PostRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        return true;
+        $post = $this->route('post');
+
+        return $post->user_id == Auth::id();
     }
 
     /**
@@ -21,9 +24,9 @@ class UpdatePostRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
-            'body' => ['nullable', 'string'],
-            'user_id' => ['numeric']
-        ];
+        return array_merge(parent::rules(), [
+            'deleted_file_ids' => 'array',
+            'deleted_file_ids.*' => 'numeric',
+        ]);
     }
 }
