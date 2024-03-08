@@ -22,7 +22,7 @@ class PostResource extends JsonResource
             'updated_at' => Carbon::parse($this->updated_at)->diffForHumans(),
             'user' => new UserResource($this->user),
             'group' => $this->group,
-            'attachments' => $this->attachments
+            'attachments' => PostAttachmentsResource::collection($this->attachments)
         ];
     }
 }

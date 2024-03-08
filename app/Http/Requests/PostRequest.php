@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rules\File;
 
 class PostRequest extends FormRequest
 {
@@ -23,6 +24,13 @@ class PostRequest extends FormRequest
     {
         return [
             'body' => 'required',
+            'attachments' => 'array|max:30' ,
+            'attachments.*' => ['file' , File::types([
+                'jpg', 'jpeg', 'png', 'gif', 'webp',
+                'mp3', 'wav', 'mp4',
+                "doc", "docx", "pdf", "csv", "xls", "xlsx",
+                "zip"
+            ])],
             'user_id' => 'numeric'
         ];
     }
