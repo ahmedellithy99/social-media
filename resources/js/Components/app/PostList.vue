@@ -1,6 +1,7 @@
 <script setup>
 import PostItem from "@/Components/app/PostItem.vue";
 import PostModal from "@/Components/app/PostModal.vue";
+import AttachmentModal from "@/Components/app/AttachmentModal.vue";
 import {ref} from "vue";
 import {usePage} from "@inertiajs/vue3";
 
@@ -10,7 +11,8 @@ defineProps({
 
 const authUser = usePage().props.auth.user;
 const showEditModal = ref(false)
-
+const showAttachmentsModal = ref(false)
+const previewAttachmentPost = ref({})
 const editPost = ref({})
 
 function openEditModal(post) {
@@ -18,6 +20,7 @@ function openEditModal(post) {
     
     showEditModal.value = true;
 }
+
 function onModalHide() {
     editPost.value = {
         id: null,
@@ -25,13 +28,28 @@ function onModalHide() {
         user: authUser
     }   
 }
+
+function openAttachmentPreviewModal(post , index)
+{   
+    previewAttachmentPost.value = {
+        post ,
+        index
+    }
+    showAttachmentsModal.value = true
+}
 </script>
 
 <template>
     <div class="overflow-auto">
-        <PostItem v-for="post of posts" :key="post.id" :post="post" @editClick="openEditModal"/>
+        <PostItem v-for="post of posts" :key="post.id" :post="post"
+        @editClick="openEditModal"
+        @attachmentClick="openAttachmentPreviewModal"/>
 
         <PostModal :post="editPost" v-model="showEditModal" @hide="onModalHide"/>
+        <AttachmentModal :attachments="previewAttachmentPost.post?.attachments || []" , 
+                        v-model:index="previewAttachmentPost.index"
+                        v-model="showAttachmentsModal"/>
+
     </div>
 </template>
 
