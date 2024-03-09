@@ -2,15 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Enums\PostReactionEnum;
 use App\Http\Requests\PostRequest;
 use App\Http\Requests\UpdatePostRequest;
 use App\Models\Post;
 use App\Models\PostAttachment;
+use App\Models\Reaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 
 use function Laravel\Prompts\error;
 
@@ -140,4 +143,42 @@ class PostController extends Controller
         $post->delete();
         return back();
     }
+
+    public function postReaction(Request $request ,Post $post)
+    {
+        $data =$request->validate([
+            'reaction' => [Rule::enum(PostReactionEnum::class)]
+        ]);
+
+        $userId = auth()->user()->id;
+        
+        $reaction = Reaction::where('post_id' , $post->id)->where('user_id' , $userId )->first();
+
+        if($reaction)
+        {
+            $hasReaction = false;
+            $reaction->delete();
+        }
+        else
+        {   
+            $hasReaction = true;
+            Reaction::create(
+                [
+                    'user_id' => $userId,
+                    'post_id' => $post->id,
+                    'type' => $data['reaction']
+                ]
+            );
+        }
+
+        $reactions = Reaction::where('post_id' , $post->id)->count();
+
+        return response([
+            'num_of_reactions' => $reactions,
+            'current_user_has_reaction' => $hasReaction
+        ]);
+
+    }
+
+
 }

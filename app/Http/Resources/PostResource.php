@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Reaction;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -15,6 +16,8 @@ class PostResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        
+        // dd(auth()->user()->id);
         return [
             'id' => $this->id,
             'body' => $this->body,
@@ -22,7 +25,10 @@ class PostResource extends JsonResource
             'updated_at' => Carbon::parse($this->updated_at)->diffForHumans(),
             'user' => new UserResource($this->user),
             'group' => $this->group,
-            'attachments' => PostAttachmentsResource::collection($this->attachments)
+            'attachments' => PostAttachmentsResource::collection($this->attachments),
+            'num_of_reactions' => $this->reactions_count,
+            'current_user_has_reaction' => $this->reactions > 0 
+            
         ];
     }
 }
