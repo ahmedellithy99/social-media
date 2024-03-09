@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Validation\Rules\File;
 
 class PostRequest extends FormRequest
@@ -10,7 +11,7 @@ class PostRequest extends FormRequest
 
     public static array $extensions = ['jpg', 'jpeg', 'png', 'gif', 'webp',
     'mp3', 'wav', 'mp4',
-    "doc", "docx", "pdf", "csv", "xls", "xlsx",
+    "doc", "docx", "csv", "xls", "xlsx",
     "zip" ];
     
     /**
@@ -29,9 +30,20 @@ class PostRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'body' => 'required',
-            'attachments' => 'array|max:30' ,
-            'attachments.*' => ['file' , File::types(self::$extensions)],
+            'body' => 'nullable',
+            'attachments' => [
+                'array',
+                'max:50',
+                function ($attribute, $value, $fail) {
+                    // Custom rule to check the total size of all files
+                    $totalSize = collect($value)->sum(fn(UploadedFile $file) => $file->getSize());
+
+                    if ($totalSize > 1 * 1024 * 1024 * 1024) {
+                        $fail('The total size of all files must not exceed 1GB.');
+                    }
+                },
+            ] ,
+            'attachments.*' => ['file' , File::types(self::$extensions) , 'max: 50000'],
             'user_id' => 'numeric'
         ];
     }
@@ -48,7 +60,9 @@ class PostRequest extends FormRequest
     public function messages()
     {
         return [
-            'attachments.*' => 'Invalid File'
+            'attachments.*.file' => 'Each attachment must be a file.',
+            'attachments.*.mimes' => 'Invalid file type for attachments.',
+            'attachments.*.max' => 'Yoy must not exceed 50MB File'
         ];
     }
 }
