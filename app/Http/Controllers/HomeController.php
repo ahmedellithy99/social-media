@@ -10,15 +10,22 @@ use Inertia\Inertia;
 class HomeController extends Controller
 {
     public function index()
-    {
-        $userId = auth()->user()->id;
-        $posts = Post::with('attachments')->withCount('reactions')
-                                        ->with(['reactions' => function ($query) use ($userId) {
-                                            $query->where('user_id', $userId);
-                                        }])
-                                        ->latest()
-                                        ->paginate(20);
+    {   
+        // dd(auth()->user()->id));
+        if(isset(auth()->user()->id)){
 
-        return Inertia::render('Home' , ['posts' => PostResource::collection($posts)] );
+            $userId = auth()->user()->id;
+            $posts = Post::with('attachments')->withCount('reactions')
+                                            ->withCount('comments')
+                                            ->with(['comments','reactions' => function ($query) use ($userId) {
+                                                $query->where('user_id', $userId);
+                                            }])
+                                            ->latest()
+                                            ->paginate(20);
+    
+            return Inertia::render('Home' , ['posts' => PostResource::collection($posts)] );
+        }
+
+        return redirect(route('login'));
     }
 }

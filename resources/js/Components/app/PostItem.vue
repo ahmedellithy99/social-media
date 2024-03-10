@@ -6,15 +6,21 @@ import {Disclosure, DisclosureButton, DisclosurePanel} from '@headlessui/vue'
 import {ChatBubbleLeftRightIcon, HandThumbUpIcon, ArrowDownTrayIcon} from '@heroicons/vue/24/outline'
 import {ref} from "vue";
 import PostUserHeader from "@/Components/app/PostUserHeader.vue";
-import { router } from '@inertiajs/vue3';
+import { router, usePage } from '@inertiajs/vue3';
 import {isImage} from '@/helpers.js';
 import axiosClient from '@/axiosClient.js';
+import ReadMoreReadLess from '@/Components/app/ReadMoreReadLess.vue';
+import InputTextarea from '../InputTextarea.vue';
+import IndigoButton from '@/Components/app/IndigoButton.vue';
 
 const props = defineProps({
     post: Object
 })
 
-const emit = defineEmits(['editClick' , 'attachmentClick'])
+const authUser = usePage().props.auth.user ;
+const emit = defineEmits(['editClick' , 'attachmentClick']);
+
+const newCommentText = ref('');
 
 function openEditModal(){
     emit('editClick', props.post)
@@ -45,11 +51,21 @@ function sendReaction()
         })
 }
 
+function createComment() {
+    axiosClient.post(route('post.comment', props.post), {
+        comment: newCommentText.value
+    })
+        .then(({data}) => {
+            newCommentText.value = ''
+            props.post.comments.unshift(data)
+            props.post.num_of_comments++;
+        })
+}
+
 
 </script>
 <template>
     <div class="bg-white border rounded p-4 mb-3">
-
         <div class="flex items-center justify-between mb-3">
             <PostUserHeader :post="post"/>
             <Menu as="div" class="relative z-10  inline-block text-left">
@@ -113,19 +129,7 @@ function sendReaction()
             </Menu>
         </div>
         <div class="mb-3">
-            <Disclosure v-slot="{ open }">
-                <div v-if="!open" v-html="post.body.substring(0, 200)" />
-                <template v-if="post.body.length > 200">
-                    <DisclosurePanel>
-                        <div v-html="post.body"/>
-                    </DisclosurePanel>
-                    <div class="flex justify-end">
-                        <DisclosureButton class="text-blue-500 hover:underline">
-                            {{ open ? 'Read less' : 'Read More' }}
-                        </DisclosureButton>
-                    </div>
-                </template>
-            </Disclosure>
+            <ReadMoreReadLess :content="post.body" />
             
         </div>
         <div class="grid gap-3 mb-3" :class="[
@@ -161,23 +165,66 @@ function sendReaction()
                 </div>
             </template>
         </div>
-        <div class="flex gap-2">
-            <button @click="sendReaction" class="text-gray-800 flex gap-1 items-center justify-center  rounded-lg py-2 px-4 flex-1"
-                :class="[
+        <Disclosure v-slot="{ open }">
+            <div class="flex gap-2">
+                <button
+                    @click="sendReaction"
+                    class="text-gray-800 flex gap-1 items-center justify-center  rounded-lg py-2 px-4 flex-1"
+                    :class="[
                     post.current_user_has_reaction ?
                     'bg-sky-100 hover:bg-sky-200' :
                     'bg-gray-100  hover:bg-gray-200'
                 ]"
-            >
-                <HandThumbUpIcon class="w-5 h-5"/>
-                <span class="mr-2">{{post.num_of_reactions}}</span>
-                {{ post.current_user_has_reaction ? 'Unlike' : 'Like'}}
-            </button>
-            <button class="text-gray-800 flex gap-1 items-center justify-center bg-gray-100 rounded-lg hover:bg-gray-200 py-2 px-4 flex-1">
-                <ChatBubbleLeftRightIcon class="w-5 h-5 mr-2"/>
-                Comment
-            </button>
-        </div>
+                >
+                    <HandThumbUpIcon class="w-5 h-5"/>
+                    <span class="mr-2">{{ post.num_of_reactions }}</span>
+                    {{ post.current_user_has_reaction ? 'Unlike' : 'Like' }}
+                </button>
+                <DisclosureButton
+                    class="text-gray-800 flex gap-1 items-center justify-center bg-gray-100 rounded-lg hover:bg-gray-200 py-2 px-4 flex-1"
+                >
+                    <ChatBubbleLeftRightIcon class="w-5 h-5"/>
+                    <span class="mr-2">{{ post.num_of_comments }}</span>
+                    Comment
+                </DisclosureButton>
+            </div>
+
+            <DisclosurePanel class="mt-3">
+                <div class="flex gap-2 mb-3">
+                    <a href="javascript:void(0)">
+                        <img :src="authUser.avatar_url"
+                            class="w-[40px] h-[40px] rounded-full border-2 transition-all hover:border-blue-500"/>
+                    </a>
+                    <div class="flex flex-1">
+                        <InputTextarea v-model="newCommentText" placeholder="Enter your comment here" rows="1"
+                                    class="w-full max-h-[160px] resize-none rounded-r-none"></InputTextarea>
+                        <IndigoButton @click="createComment" class="rounded-l-none w-[100px] ">Submit</IndigoButton>
+                    </div>
+                </div>
+                <div>
+                    
+                    <div>
+            <!-- Comment Item -->
+                        <div class="flex mb-4 mt-8" v-for="comment of props.post.comments">
+                            <img :src="comment.user.avatar_url" alt="https://placekitten.com/40/40" class="rounded-full w-[40px] h-[40px] mr-2">
+                            <div>
+                                <p class="font-semibold text-blue-500">{{ comment.user.name }}</p>
+                                <p>{{ comment.comment }}</p>
+                                <div class="flex items-center text-gray-500">
+                                    <span class="mr-2">{{ comment.updated_at }}</span>
+                                    <span>Like</span>
+                                    <span class="mx-2">·</span>
+                                    <span>Reply</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Add more comments as needed -->
+
+                        </div>
+                </div>
+            </DisclosurePanel>
+        </Disclosure>
     </div>
 </template>
 <style scoped>

@@ -17,7 +17,7 @@ class PostResource extends JsonResource
     public function toArray(Request $request): array
     {
         
-        // dd(auth()->user()->id);
+        // dd(isset($this->reactions));
         return [
             'id' => $this->id,
             'body' => $this->body,
@@ -27,8 +27,9 @@ class PostResource extends JsonResource
             'group' => $this->group,
             'attachments' => PostAttachmentsResource::collection($this->attachments),
             'num_of_reactions' => $this->reactions_count,
-            'current_user_has_reaction' => $this->reactions > 0 
-            
+            'current_user_has_reaction' => $this->reactions->count() > 0,
+            'num_of_comments' => $this->comments_count,
+            'comments' => CommentResource::collection($this->comments)
         ];
     }
 }
