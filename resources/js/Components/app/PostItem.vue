@@ -62,6 +62,16 @@ function createComment() {
         })
 }
 
+function deleteComment(commentId) {
+    axiosClient.delete(route('delete.comment', commentId), {
+    })
+        .then(() => {
+            props.post.comments = props.post.comments.filter(c => c.id !== commentId);   
+            props.post.num_of_comments--;
+        })
+}
+
+
 
 </script>
 <template>
@@ -137,7 +147,7 @@ function createComment() {
         ]">
             <template v-for="(attachment, ind) of post.attachments.slice(0, 4)">
                 <div @click="openAttachment(ind)" 
-                class="group h-48 w-fit aspect-square bg-blue-100 flex flex-col items-center justify-center text-gray-500 relative cursor-pointer">
+                class="group  aspect-square w-[200px] bg-blue-100 flex flex-col items-center justify-center text-gray-500 relative cursor-pointer">
                     <div v-if="ind === 3 && post.attachments.length > 4"
                         class="absolute left-0 top-0 right-0 bottom-0 z-10 bg-black/60 text-white flex items-center justify-center text-2xl">
                         +{{ post.attachments.length - 4 }} more
@@ -151,7 +161,7 @@ function createComment() {
                     <!--/ Download-->
                     <img v-if="isImage(attachment)"
                         :src="attachment.url"
-                        class="object-contain aspect-square"/>
+                        class=""/>
                     <template v-else>
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
                             class="w-12 h-12">
@@ -201,28 +211,32 @@ function createComment() {
                         <IndigoButton @click="createComment" class="rounded-l-none w-[100px] ">Submit</IndigoButton>
                     </div>
                 </div>
-                <div>
+                
                     
-                    <div>
-            <!-- Comment Item -->
-                        <div class="flex mb-4 mt-8" v-for="comment of props.post.comments">
-                            <img :src="comment.user.avatar_url" alt="https://placekitten.com/40/40" class="rounded-full w-[40px] h-[40px] mr-2">
-                            <div>
-                                <p class="font-semibold text-blue-500">{{ comment.user.name }}</p>
-                                <p>{{ comment.comment }}</p>
-                                <div class="flex items-center text-gray-500">
-                                    <span class="mr-2">{{ comment.updated_at }}</span>
-                                    <span>Like</span>
-                                    <span class="mx-2">·</span>
-                                    <span>Reply</span>
-                                </div>
+                <div>
+
+                    <!-- Comment Item -->
+                    <div class="flex mb-4 mt-8" v-for="comment of props.post.comments">
+                        
+                        <img :src="comment.user.avatar_url" alt="https://placekitten.com/40/40" class="rounded-full w-[40px] h-[40px] mr-2">
+                        <div>
+                            <p class="font-semibold text-blue-500">{{ comment.user.name }}</p>
+                            <p v-html="comment.comment "></p>
+                            <div class="flex items-center text-gray-500">
+                                <span class="mr-2">{{ comment.updated_at }}</span>
+                                <span>Like</span>
+                                <span class="mx-2">·</span>
+                                <span>Reply</span>
                             </div>
                         </div>
-                        
-                        <!-- Add more comments as needed -->
+                        <div class="ml-auto">
+                            <button @click="deleteComment(comment.id)" v-if="authUser.id == comment.user.id" class="text-red-500 ">Delete</button>
 
                         </div>
+                    </div>
+
                 </div>
+                
             </DisclosurePanel>
         </Disclosure>
     </div>

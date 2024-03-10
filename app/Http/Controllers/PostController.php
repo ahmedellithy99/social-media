@@ -140,9 +140,26 @@ class PostController extends Controller
         {
             return response("You don't have permission to delete this post", 403);
         }
+        try {
+            DB::beginTransaction();
+        
+            // Perform your database operations here
+            $post->comments()->delete();
+            $post->reactions()->delete();
+            $post->delete();
+        
+            // If all operations are successful, commit the transaction
+            DB::commit();
+        
+        } catch (\Exception $e) {
+            // If any operation fails, rollback the transaction
+            DB::rollback();
+        
+            // Handle the exception (log it, display a message, etc.)
+            throw $e;
+        }
         
         
-        $post->delete();
         return back();
     }
 
@@ -193,6 +210,14 @@ class PostController extends Controller
         ]);
 
         return response(new CommentResource($comment) , 201);
+    }
+
+    public function deleteComment(Comment $comment)
+    {
+        
+        $comment->delete();
+
+        return response(200);
     }
 
 

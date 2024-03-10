@@ -37,7 +37,7 @@ onMounted(() => {
 });
 
 watch(() => props.modelValue, () => {
-    console.log("Changed")
+    
     setTimeout(() => {
         adjustHeight()
     }, 10)

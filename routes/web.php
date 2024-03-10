@@ -30,7 +30,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/post/{post}' , [PostController::class , 'destroy'])->name('post.delete');
     Route::post('/post/{post}/reaction' , [PostController::class , 'postReaction'])->name('post.reaction');
     Route::post('/post/{post}/comment' , [PostController::class , 'postComment'])->name('post.comment');
-
+    Route::delete('/post/{comment}/comment' , [PostController::class , 'deleteComment'])->name('delete.comment');
 
 });
 
