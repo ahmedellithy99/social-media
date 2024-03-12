@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class Reaction extends Model
 {
@@ -11,4 +12,9 @@ class Reaction extends Model
 
     const UPDATED_AT = null ;
     protected $guarded = [];
+
+    public function reactable():MorphTo
+    {
+        return $this->morphTo();
+    }
 }

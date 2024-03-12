@@ -18,6 +18,7 @@ const props = defineProps({
 })
 
 const authUser = usePage().props.auth.user ;
+
 const emit = defineEmits(['editClick' , 'attachmentClick']);
 
 const newCommentText = ref('');
@@ -41,14 +42,17 @@ function openAttachment(ind)
 }
 
 function sendReaction()
-{
+{   
+    console.log('alo');
     axiosClient.post(route('post.reaction' , props.post ) ,{
-        'reaction' :'like'
+    'reaction' :'like'
     } )
+
     .then(({data}) => {
-            props.post.current_user_has_reaction = data.current_user_has_reaction
-            props.post.num_of_reactions = data.num_of_reactions;
-        })
+
+        props.post.current_user_has_reaction = data.current_user_has_reaction;
+        props.post.num_of_reactions = data.num_of_reactions;
+    })
 }
 
 function createComment() {
@@ -65,9 +69,20 @@ function createComment() {
 function deleteComment(commentId) {
     axiosClient.delete(route('delete.comment', commentId), {
     })
-        .then(() => {
-            props.post.comments = props.post.comments.filter(c => c.id !== commentId);   
-            props.post.num_of_comments--;
+        // .then(() => {
+        //     props.post.comments = props.post.comments.filter(c => c.id !== commentId);   
+        //     props.post.num_of_comments--;
+        // })
+}
+
+function commentReaction(comment)
+{
+    axiosClient.post(route('comment.reaction' , comment.id ) ,{
+        'reaction' : 'like'
+    }).then(({data}) => {
+
+        comment.current_user_has_reaction = data.current_user_has_reaction;
+        comment.num_of_reactions = data.num_of_reactions;
         })
 }
 
@@ -75,171 +90,176 @@ function deleteComment(commentId) {
 
 </script>
 <template>
-    <div class="bg-white border rounded p-4 mb-3">
-        <div class="flex items-center justify-between mb-3">
-            <PostUserHeader :post="post"/>
-            <Menu as="div" class="relative z-10  inline-block text-left">
-                <div>
-                    <MenuButton
-                        class="w-8 h-8 rounded-full hover:bg-black/5 transition flex items-center justify-center"
-                    >
 
-                        <EllipsisVerticalIcon
-                            class="w-5 h-5"
-                            aria-hidden="true"
-                        />
-                    </MenuButton>
-                </div>
 
-                <transition
-                    enter-active-class="transition duration-100 ease-out"
-                    enter-from-class="transform scale-95 opacity-0"
-                    enter-to-class="transform scale-100 opacity-100"
-                    leave-active-class="transition duration-75 ease-in"
-                    leave-from-class="transform scale-100 opacity-100"
-                    leave-to-class="transform scale-95 opacity-0"
-                >
-                    <MenuItems
-                        class="absolute z-20 right-0 mt-2 w-32 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black/5 focus:outline-none"
-                    >
-                        <div class="px-1 py-1">
-                            <MenuItem v-slot="{ active }">
-                                <button
-                                    @click="openEditModal"
-                                    :class="[
-                                            active ? 'bg-indigo-500 text-white' : 'text-gray-900',
-                                            'group flex w-full items-center rounded-md px-2 py-2 text-sm',
-                                            ]"
-                                >
-                                                <PencilIcon
-                                                    class="mr-2 h-5 w-5"
-                                                    aria-hidden="true"
-                                                />
-                                                Edit
-                                </button>
-                            </MenuItem>
-                            <MenuItem v-slot="{ active }">
-                                            <button
-                                            @click="deletePost"
-                                                :class="[
-                                            active ? 'bg-indigo-500 text-white' : 'text-gray-900',
-                                            'group flex w-full items-center rounded-md px-2 py-2 text-sm',
-                                            ]"
-                                            >
-                                    <TrashIcon
-                                        class="mr-2 h-5 w-5"
-                                        aria-hidden="true"
-                                    />
-                                    Delete
-                                </button>
-                            </MenuItem>
-                        </div>
-                    </MenuItems>
-                </transition>
-            </Menu>
-        </div>
-        <div class="mb-3">
-            <ReadMoreReadLess :content="post.body" />
-            
-        </div>
-        <div class="grid gap-3 mb-3" :class="[
-            post.attachments.length === 1 ? 'grid-cols-1' : 'grid-cols-2'
-        ]">
-            <template v-for="(attachment, ind) of post.attachments.slice(0, 4)">
-                <div @click="openAttachment(ind)" 
-                class="group  aspect-square w-[200px] bg-blue-100 flex flex-col items-center justify-center text-gray-500 relative cursor-pointer">
-                    <div v-if="ind === 3 && post.attachments.length > 4"
-                        class="absolute left-0 top-0 right-0 bottom-0 z-10 bg-black/60 text-white flex items-center justify-center text-2xl">
-                        +{{ post.attachments.length - 4 }} more
-                    </div>
+<div class="bg-white border rounded p-4 mb-3">
+        <!-- Post Header -->
 
-                    <!-- Download-->
-                    <button
-                        class="z-20 opacity-0 group-hover:opacity-100 transition-all w-8 h-8 flex items-center justify-center text-gray-100 bg-gray-700 rounded absolute right-2 top-2 cursor-pointer hover:bg-gray-800">
-                        <ArrowDownTrayIcon class="w-4 h-4" />
-                    </button>
-                    <!--/ Download-->
-                    <img v-if="isImage(attachment)"
-                        :src="attachment.url"
-                        class=""/>
-                    <template v-else>
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
-                            class="w-12 h-12">
-                            <path
-                                d="M5.625 1.5c-1.036 0-1.875.84-1.875 1.875v17.25c0 1.035.84 1.875 1.875 1.875h12.75c1.035 0 1.875-.84 1.875-1.875V12.75A3.75 3.75 0 0016.5 9h-1.875a1.875 1.875 0 01-1.875-1.875V5.25A3.75 3.75 0 009 1.5H5.625z"/>
-                            <path
-                                d="M12.971 1.816A5.23 5.23 0 0114.25 5.25v1.875c0 .207.168.375.375.375H16.5a5.23 5.23 0 013.434 1.279 9.768 9.768 0 00-6.963-6.963z"/>
-                        </svg>
-                        <small>{{ attachment.name }}</small>
-                    </template>
-                </div>
-            </template>
-        </div>
-        <Disclosure v-slot="{ open }">
-            <div class="flex gap-2">
-                <button
-                    @click="sendReaction"
-                    class="text-gray-800 flex gap-1 items-center justify-center  rounded-lg py-2 px-4 flex-1"
-                    :class="[
-                    post.current_user_has_reaction ?
-                    'bg-sky-100 hover:bg-sky-200' :
-                    'bg-gray-100  hover:bg-gray-200'
-                ]"
+    <div class="flex items-center justify-between mb-3">
+        <PostUserHeader :post="post" />
+        <Menu as="div" class="relative z-10 inline-block text-left">
+        
+            <div>
+                <MenuButton
+                    class="w-8 h-8 rounded-full hover:bg-black/5 transition flex items-center justify-center"
                 >
-                    <HandThumbUpIcon class="w-5 h-5"/>
-                    <span class="mr-2">{{ post.num_of_reactions }}</span>
-                    {{ post.current_user_has_reaction ? 'Unlike' : 'Like' }}
-                </button>
-                <DisclosureButton
-                    class="text-gray-800 flex gap-1 items-center justify-center bg-gray-100 rounded-lg hover:bg-gray-200 py-2 px-4 flex-1"
-                >
-                    <ChatBubbleLeftRightIcon class="w-5 h-5"/>
-                    <span class="mr-2">{{ post.num_of_comments }}</span>
-                    Comment
-                </DisclosureButton>
+
+                    <EllipsisVerticalIcon
+                        class="w-5 h-5"
+                        aria-hidden="true"
+                    />
+                </MenuButton>
             </div>
 
-            <DisclosurePanel class="mt-3">
-                <div class="flex gap-2 mb-3">
-                    <a href="javascript:void(0)">
-                        <img :src="authUser.avatar_url"
-                            class="w-[40px] h-[40px] rounded-full border-2 transition-all hover:border-blue-500"/>
-                    </a>
-                    <div class="flex flex-1">
-                        <InputTextarea v-model="newCommentText" placeholder="Enter your comment here" rows="1"
+            <transition
+                enter-active-class="transition duration-100 ease-out"
+                enter-from-class="transform scale-95 opacity-0"
+                enter-to-class="transform scale-100 opacity-100"
+                leave-active-class="transition duration-75 ease-in"
+                leave-from-class="transform scale-100 opacity-100"
+                leave-to-class="transform scale-95 opacity-0"
+            >
+                <MenuItems
+                    class="absolute z-20 right-0 mt-2 w-32 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black/5 focus:outline-none"
+                >
+                    <div class="px-1 py-1">
+                        <MenuItem v-slot="{ active }">
+                            <button
+                                @click="openEditModal"
+                                :class="[
+                                        active ? 'bg-indigo-500 text-white' : 'text-gray-900',
+                                        'group flex w-full items-center rounded-md px-2 py-2 text-sm',
+                                        ]"
+                            >
+                                            <PencilIcon
+                                                class="mr-2 h-5 w-5"
+                                                aria-hidden="true"
+                                            />
+                                            Edit
+                            </button>
+                        </MenuItem>
+                        <MenuItem v-slot="{ active }">
+                                        <button
+                                        @click="deletePost"
+                                            :class="[
+                                        active ? 'bg-indigo-500 text-white' : 'text-gray-900',
+                                        'group flex w-full items-center rounded-md px-2 py-2 text-sm',
+                                        ]"
+                                        >
+                                <TrashIcon
+                                    class="mr-2 h-5 w-5"
+                                    aria-hidden="true"
+                                />
+                                Delete
+                            </button>
+                        </MenuItem>
+                    </div>
+                </MenuItems>
+            </transition>
+        </Menu>
+    </div>
+
+        <!-- Post Content -->
+    <div class="mb-3">
+    <ReadMoreReadLess :content="post.body" />
+    </div>
+
+        <!-- Post Attachments -->
+    <div class="grid gap-3 mb-3" :class="[post.attachments.length === 1 ? 'grid-cols-1':'grid-cols-2']">
+        <!-- Attachment Grid -->
+        <template v-for="(attachment, ind) of post.attachments.slice(0, 4)">
+        <!-- Attachment Item -->
+        <div
+            @click="openAttachment(ind)"
+            class=" group max-h-[250px] bg-blue-100 flex flex-col items-center justify-center text-gray-500 relative cursor-pointer"
+        >
+            <!-- Download Button -->
+            <button
+            class="z-20 opacity-0 group-hover:opacity-100 transition-all w-8 h-8 flex items-center justify-center text-gray-100 bg-gray-700 rounded absolute right-2 top-2 cursor-pointer hover:bg-gray-800"
+            >
+            <ArrowDownTrayIcon class="w-4 h-4" />
+            </button>
+    <!-- Image or Icon -->
+        <img v-if="isImage(attachment)" :src="attachment.url" class="w-full h-full" alt="Attachment" />
+        <template v-else>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-12 h-12">
+                <path d="M5.625 1.5c-1.036 0-1.875.84-1.875 1.875v17.25c0 1.035.84 1.875 1.875 1.875h12.75c1.035 0 1.875-.84 1.875-1.875V12.75A3.75 3.75 0 0016.5 9h-1.875a1.875 1.875 0 01-1.875-1.875V5.25A3.75 3.75 0 009 1.5H5.625z" />
+                <path d="M12.971 1.816A5.23 5.23 0 0114.25 5.25v1.875c0 .207.168.375.375.375H16.5a5.23 5.23 0 013.434 1.279 9.768 9.768 0 00-6.963-6.963z" />
+            </svg>
+            <small>{{ attachment.name }}</small>
+        </template>
+        </div>
+        </template>
+        </div>
+
+        <Disclosure>
+        <!-- Post Actions (Like, Comment) -->
+
+        <div class="flex gap-2">
+            <!-- Like Button -->
+            <button
+            @click="sendReaction"
+            class="text-gray-800 flex gap-1 items-center justify-center rounded-lg py-2 px-4 flex-1  hover:bg-gray-200"
+            :class="[post.current_user_has_reaction ? 'bg-gray-300' : 'bg-gray-100'] "
+            >
+            <HandThumbUpIcon class="w-5 h-5" />
+            <span class="mr-2">{{ post.num_of_reactions }}</span>
+            {{ post.current_user_has_reaction ? 'Unlike' : 'Like' }}
+            </button>
+            <!-- Comment Button -->
+            <DisclosureButton
+            class="text-gray-800 flex gap-1 items-center justify-center rounded-lg py-2 px-4 flex-1 bg-gray-100 hover:bg-gray-200"
+            >
+            <ChatBubbleLeftRightIcon class="w-5 h-5" />
+            <span class="mr-2">{{ post.num_of_comments }}</span>
+            Comment
+            </DisclosureButton>
+        </div>
+
+        <!-- Comments -->
+        <DisclosurePanel class="mt-3">
+            <div class="flex gap-2 mb-3">
+            <!-- User Avatar and Comment Input -->
+                    <InputTextarea v-model="newCommentText" placeholder="Enter your comment here" rows="1"
                                     class="w-full max-h-[160px] resize-none rounded-r-none"></InputTextarea>
-                        <IndigoButton @click="createComment" class="rounded-l-none w-[100px] ">Submit</IndigoButton>
-                    </div>
-                </div>
-                
-                    
+                    <IndigoButton @click="createComment" class="rounded-l-none w-[100px] ">Submit</IndigoButton>
+            </div>
+            <div>
+            <!-- Comment Items -->
+            <div class="flex mb-4 mt-8" v-for="comment of props.post.comments">
+                <!-- Comment Content -->
+                <div class="flex items-start">
+                <!-- User Avatar -->
+                <img :src="comment.user.avatar_url" alt="User Avatar" class="rounded-full w-10 h-10 mr-2" />
+                <!-- Comment Details -->
                 <div>
-
-                    <!-- Comment Item -->
-                    <div class="flex mb-4 mt-8" v-for="comment of props.post.comments">
-                        
-                        <img :src="comment.user.avatar_url" alt="https://placekitten.com/40/40" class="rounded-full w-[40px] h-[40px] mr-2">
-                        <div>
-                            <p class="font-semibold text-blue-500">{{ comment.user.name }}</p>
-                            <p v-html="comment.comment "></p>
-                            <div class="flex items-center text-gray-500">
-                                <span class="mr-2">{{ comment.updated_at }}</span>
-                                <span>Like</span>
-                                <span class="mx-2">·</span>
-                                <span>Reply</span>
-                            </div>
-                        </div>
-                        <div class="ml-auto">
-                            <button @click="deleteComment(comment.id)" v-if="authUser.id == comment.user.id" class="text-red-500 ">Delete</button>
-
-                        </div>
+                    
+                    <p class="font-semibold text-blue-500">{{ comment.user.name }}</p>
+                    <p v-html="comment.comment"></p>
+                    <div class="flex items-center text-gray-500">
+                    <span class="mr-2">{{ comment.updated_at }}</span>
+                    <button @click="commentReaction(comment)" 
+                    :class="[comment.current_user_has_reaction ? 'bg-gray-300' : 'bg-gray-100'] ">
+                        Like
+                    </button>
+                    <span class="mx-2">·</span>
+                    <span>Reply</span>
                     </div>
-
                 </div>
-                
-            </DisclosurePanel>
+                <!-- Delete Comment Button -->
+                <div class="ml-auto" v-if="authUser.id === comment.user.id">
+                    <button @click="deleteComment(comment.id)" class="text-red-500">Delete</button>
+                </div>
+                </div>
+            </div>
+            </div>
+        </DisclosurePanel>
         </Disclosure>
     </div>
 </template>
+
+<style scoped>
+/* Your scoped styles go here */
+</style>
 <style scoped>
 </style>
