@@ -165,32 +165,27 @@ function commentReaction(comment)
     </div>
 
         <!-- Post Attachments -->
-    <div class="grid gap-3 mb-3" :class="[post.attachments.length === 1 ? 'grid-cols-1':'grid-cols-2']">
-        <!-- Attachment Grid -->
-        <template v-for="(attachment, ind) of post.attachments.slice(0, 4)">
+        <div class="grid gap-4 mb-4" :class="[post.attachments.length === 1 ? 'grid-cols-1':'grid-cols-2']">
+    <!-- Attachment Grid -->
+    <template v-for="(attachment, ind) of post.attachments.slice(0, 4)">
         <!-- Attachment Item -->
-        <div
-            @click="openAttachment(ind)"
-            class=" group max-h-[250px] bg-blue-100 flex flex-col items-center justify-center text-gray-500 relative cursor-pointer"
-        >
+        <div @click="openAttachment(ind)" class="group max-h-[300px] w-[300px] bg-blue-100 flex flex-col items-center justify-center text-gray-500 relative cursor-pointer">
             <!-- Download Button -->
-            <button
-            class="z-20 opacity-0 group-hover:opacity-100 transition-all w-8 h-8 flex items-center justify-center text-gray-100 bg-gray-700 rounded absolute right-2 top-2 cursor-pointer hover:bg-gray-800"
-            >
-            <ArrowDownTrayIcon class="w-4 h-4" />
+            <button class="z-20 opacity-0 group-hover:opacity-100 transition-all w-10 h-10 flex items-center justify-center text-white bg-blue-700 rounded absolute right-2 top-2 cursor-pointer hover:bg-blue-800">
+                <ArrowDownTrayIcon class="w-6 h-6" />
             </button>
-    <!-- Image or Icon -->
-        <img v-if="isImage(attachment)" :src="attachment.url" class="w-full h-full" alt="Attachment" />
-        <template v-else>
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-12 h-12">
-                <path d="M5.625 1.5c-1.036 0-1.875.84-1.875 1.875v17.25c0 1.035.84 1.875 1.875 1.875h12.75c1.035 0 1.875-.84 1.875-1.875V12.75A3.75 3.75 0 0016.5 9h-1.875a1.875 1.875 0 01-1.875-1.875V5.25A3.75 3.75 0 009 1.5H5.625z" />
-                <path d="M12.971 1.816A5.23 5.23 0 0114.25 5.25v1.875c0 .207.168.375.375.375H16.5a5.23 5.23 0 013.434 1.279 9.768 9.768 0 00-6.963-6.963z" />
-            </svg>
-            <small>{{ attachment.name }}</small>
-        </template>
+            <!-- Image or Icon -->
+            <img v-if="isImage(attachment)" :src="attachment.url" class="object-cover w-full h-full" alt="Attachment" />
+            <template v-else>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-12 h-12">
+                    <path d="M5.625 1.5c-1.036 0-1.875.84-1.875 1.875v17.25c0 1.035.84 1.875 1.875 1.875h12.75c1.035 0 1.875-.84 1.875-1.875V12.75A3.75 3.75 0 0016.5 9h-1.875a1.875 1.875 0 01-1.875-1.875V5.25A3.75 3.75 0 009 1.5H5.625z" />
+                    <path d="M12.971 1.816A5.23 5.23 0 0114.25 5.25v1.875c0 .207.168.375.375.375H16.5a5.23 5.23 0 013.434 1.279 9.768 9.768 0 00-6.963-6.963z" />
+                </svg>
+                <small>{{ attachment.name }}</small>
+            </template>
         </div>
-        </template>
-        </div>
+    </template>
+</div>
 
         <Disclosure>
         <!-- Post Actions (Like, Comment) -->
@@ -238,9 +233,11 @@ function commentReaction(comment)
                     <p v-html="comment.comment"></p>
                     <div class="flex items-center text-gray-500">
                     <span class="mr-2">{{ comment.updated_at }}</span>
+                    <p > {{ comment.num_of_reactions ? comment.num_of_reactions : '' }} </p>
                     <button @click="commentReaction(comment)" 
                     :class="[comment.current_user_has_reaction ? 'bg-gray-300' : 'bg-gray-100'] ">
-                        Like
+
+                        {{ comment.current_user_has_reaction ? 'Unlike' : 'Like'}}
                     </button>
                     <span class="mx-2">·</span>
                     <span>Reply</span>
