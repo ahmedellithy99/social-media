@@ -17,3 +17,5 @@ yarn-error.log
 /.fleet
 /.idea
 /.vscode
+resources/js/Components/app/old.vue
+resources/js/Components/app/added.vue
