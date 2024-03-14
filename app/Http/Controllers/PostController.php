@@ -10,10 +10,14 @@ use App\Models\Comment;
 use App\Models\Post;
 use App\Models\PostAttachment;
 use App\Models\Reaction;
+use App\Models\User;
+use App\Notifications\CommentNotification;
+use App\Notifications\ReactionNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 
@@ -159,22 +163,24 @@ class PostController extends Controller
             throw $e;
         }
         
-        
         return back();
     }
 
+    // Reacting on a Post 
     public function postReaction(Request $request ,Post $post)
     {   
         
         $data =$request->validate([
             'reaction' => [Rule::enum(PostReactionEnum::class)]
         ]);
+        $user = auth()->user();
 
-        $userId = auth()->user()->id;
+        // return response(['user_id' => $user->id , 'post_owner' => $post->user->id ] );
+
         
         $reaction = Reaction::where('reactable_id' , $post->id)
                             ->where('reactable_type' , Post::class)
-                            ->where('user_id' , $userId )->first();
+                            ->where('user_id' , $user->id )->first();
         
         if($reaction)
         {
@@ -183,15 +189,21 @@ class PostController extends Controller
         }
         else
         {   
+
             $hasReaction = true;
             Reaction::create(
                 [
-                    'user_id' => $userId,
+                    'user_id' => $user->id,
                     'reactable_id' => $post->id,
                     'type' => $data['reaction'],
                     'reactable_type' => Post::class,
                 ]
             );
+            if($user->id != $post->user->id)
+            {
+                Notification::send($post->user , new ReactionNotification($user->name , $post->body , $post->id));
+
+            }
         }
 
         $reactions = Reaction::where('reactable_id' , $post->id)
@@ -207,13 +219,18 @@ class PostController extends Controller
     public function postComment(Post $post , Request $request)
     {
         $data = $request->validate(['comment' => 'required']);
-        
+        $author = $post->user;
+        $commentedUser = auth()->user()->name;
+
         $comment = Comment::create([
             'comment' => nl2br($data['comment']),
             'user_id' => auth()->user()->id,
             'post_id' => $post->id
         ]);
-
+        if($author != $commentedUser)
+        {
+            Notification::send($author , new CommentNotification($commentedUser , $post->body, $post->id));
+        }
         return response(new CommentResource($comment) , 201);
     }
 

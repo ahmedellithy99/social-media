@@ -33,6 +33,8 @@ Route::middleware('auth')->group(function () {
     Route::delete('/post/{comment}/comment' , [PostController::class , 'deleteComment'])->name('delete.comment');
     Route::post('/post/{comment}/reactions' , [PostController::class , 'commentReaction'])->name('comment.reaction');
 
+    
+
 });
 
 Route::get('u/{user:username}' , [ProfileController::class , 'index'])->name('profile');
