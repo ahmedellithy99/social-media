@@ -6,6 +6,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use Illuminate\Support\Facades\Storage;
 
 class ReactionNotification extends Notification
 {
@@ -14,14 +15,16 @@ class ReactionNotification extends Notification
     public $reactedUser ;
     public $postBody;
     public $postId;
+    public $avatar_path;
     /**
      * Create a new notification instance.
      */
-    public function __construct($reactedUser , $postBody , $postId)
+    public function __construct($reactedUser , $postBody , $postId , $avatar_path)
     {
         $this->reactedUser = $reactedUser ;
         $this->postBody = $postBody ;
         $this->postId = $postId;
+        $this->avatar_path = $avatar_path;
     }
 
     /**
@@ -53,7 +56,8 @@ class ReactionNotification extends Notification
     public function toArray(object $notifiable): array
     {
         return [
-            'text' => $this->reactedUser . " Liked " . substr($this->postBody, 0 , 10),
+            'text' => $this->reactedUser . " Liked Your Post: " . substr($this->postBody, 0 , 10),
+            'avatar_url' => Storage::url($this->avatar_path),
             'post_id' => $this->postId
         ];
     }

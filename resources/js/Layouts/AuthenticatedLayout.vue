@@ -10,7 +10,8 @@ import { Link , usePage } from '@inertiajs/vue3';
 
 
 const showingNavigationDropdown = ref(false);
-const showingNotificationDropdown = ref(false); 
+const showingNotificationDropdown = ref(false);
+const showProfileDropdown = ref(false); 
 
 const authUser = usePage().props.auth.user ;
 
@@ -79,23 +80,37 @@ const props = defineProps({
                                         </DropdownLink>
                                     </template>
                                 </Dropdown>
-                                <Dropdown align="right" width="48">
-                                    <template #trigger>
-                                        <div class="inline-flex rounded-md">
-                                            <button type="button" class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-300 focus:outline-none transition ease-in-out duration-150">
-                                            >
-                                                Notifications
 
-                                                
-                                            </button>
-                                        </div>
-                                    </template>
-                                    
-                                    <template #content>
+                                <div v-if="authUser" class="hidden sm:flex sm:items-center sm:ms-6 relative">
+                                <!-- Profile Dropdown -->
+                                <div>
+                                    <button
+                                        @click="showProfileDropdown = !showProfileDropdown"
+                                        type="button"
+                                        class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-300 focus:outline-none transition ease-in-out duration-150"
+                                        aria-haspopup="true"
+                                        aria-expanded="true"
+                                    >
                                         
-                                        <DropdownLink v-for="notification of notifications"> {{ notification.data.text }} </DropdownLink>
-                                    </template>
-                                </Dropdown>
+                                    <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <!-- Adjust the SVG icon for your notification icon -->
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 18v-6a9 9 0 0118 0v6"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.73 21a2 2 0 01-3.46 0"></path>
+                                    </svg>  
+                                    </button>
+
+                                    <!-- Profile Dropdown Content -->
+                                    <div v-if="showProfileDropdown" class="h-48 w-64 origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none overflow-auto" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
+                                        <div class="py-1" role="none">
+                                            <div v-for="notification of notifications" class="flex items-center justify-center">
+                                            <img :src="notification.data.avatar_url" class="aspect aspect-square max-w-8 max-h-8 rounded-full"/>
+                                            <DropdownLink :href="route('post.show' , notification.data.post_id)"> {{ notification.data.text }} </DropdownLink>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                                
                                 
                             </div>
                         </div>
@@ -146,7 +161,7 @@ const props = defineProps({
                                         <!-- Adjust the SVG icon for your notification icon -->
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 18v-6a9 9 0 0118 0v6"></path>
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.73 21a2 2 0 01-3.46 0"></path>
-                                    </svg>
+                            </svg>
                         </button>
                         </div>
 
@@ -192,7 +207,7 @@ const props = defineProps({
                             </div>
                             <div class="mt-3 space-y-1">
                                 <!-- Notification items -->
-                                <div class="overflow-visible">
+                                <div >
                                     
                                     <DropdownLink v-for="notification of notifications"> {{notification.data.text}} </DropdownLink>
                                 </div>

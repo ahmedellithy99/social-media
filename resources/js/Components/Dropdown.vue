@@ -72,6 +72,7 @@ const open = ref(false);
                     <slot name="content" />
                 </div>
             </div>
+
         </Transition>
     </div>
 </template>

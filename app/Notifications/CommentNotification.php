@@ -6,6 +6,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use Illuminate\Support\Facades\Storage;
 
 class CommentNotification extends Notification
 {
@@ -14,14 +15,16 @@ class CommentNotification extends Notification
     public $commentedUser ;
     public $postBody;
     public $postId;
+    public $avatar_path;
     /**
      * Create a new notification instance.
      */
-    public function __construct($commentedUser , $postBody , $postId)
+    public function __construct($commentedUser , $postBody , $postId , $avatar_path)
     {
         $this->commentedUser = $commentedUser ;
         $this->postBody = $postBody ;
         $this->postId = $postId;
+        $this->avatar_path = $avatar_path;
     }
 
     /**
@@ -53,7 +56,8 @@ class CommentNotification extends Notification
     public function toArray(object $notifiable): array
     {
         return [
-            'text' => $this->commentedUser . " Comment on " . substr($this->postBody, 0 , 10),
+            'text' => $this->commentedUser . " Commented Your Post: " . substr($this->postBody, 0 , 10),
+            'avatar_url' => Storage::url($this->avatar_path),
             'post_id' => $this->postId
         ];
     }

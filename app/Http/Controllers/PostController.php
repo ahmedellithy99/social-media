@@ -219,7 +219,7 @@ class PostController extends Controller
             );
             if($user->id != $post->user->id)
             {
-                Notification::send($post->user , new ReactionNotification($user->name , $post->body , $post->id));
+                Notification::send($post->user , new ReactionNotification($user->name , $post->body , $post->id , $user->avatar_path));
 
             }
         }
@@ -238,16 +238,17 @@ class PostController extends Controller
     {
         $data = $request->validate(['comment' => 'required']);
         $author = $post->user;
-        $commentedUser = auth()->user()->name;
+        $user = auth()->user();
 
         $comment = Comment::create([
             'comment' => nl2br($data['comment']),
             'user_id' => auth()->user()->id,
             'post_id' => $post->id
         ]);
-        if($author != $commentedUser)
-        {
-            Notification::send($author , new CommentNotification($commentedUser , $post->body, $post->id));
+        if($author->id != $user->id)
+        {   
+
+            Notification::send($author , new CommentNotification($user->name , $post->body, $post->id ,$user->avatar_path));
         }
         return response(new CommentResource($comment) , 201);
     }
