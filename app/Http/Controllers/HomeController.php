@@ -11,9 +11,9 @@ class HomeController extends Controller
 {
     public function index(Request $request)
     {   
-        // dd(auth()->user()->id));
         if(isset(auth()->user()->id)){
-
+            
+            $notifications = auth()->user()->unReadNotifications;
             $userId = auth()->user()->id;
             $posts = Post::with('attachments')->withCount('reactions')
                                             ->withCount('comments')
@@ -37,7 +37,7 @@ class HomeController extends Controller
         if ($request->wantsJson()) {
                 return $posts;
         }
-            return Inertia::render('Home' , ['posts' => $posts ] );
+            return Inertia::render('Home' , ['posts' => $posts , 'notifications' => $notifications ] );
         }
 
         return redirect(route('login'));

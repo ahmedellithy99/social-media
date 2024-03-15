@@ -13,13 +13,28 @@ const showingNavigationDropdown = ref(false);
 
 const authUser = usePage().props.auth.user ;
 
+const props = defineProps({
+    notifications : Array
+})
+
+const displayedNotifications = ref(props.notifications.slice(0, 5));
+const allNotificationsLoaded = ref(false);
+
+function loadMoreNotifications()
+{
+    const startIndex = displayedNotifications.value.length;
+    const endIndex = Math.min(startIndex + 5, props.notifications.length);
+    displayedNotifications.value = [...displayedNotifications.value, ...props.notifications.slice(startIndex, endIndex)];
+
+    allNotificationsLoaded.value = endIndex === props.notifications.length;
+}
 
 </script>
 
 <template>
 
+
     <div>
-        
         
         <div class="h-screen overflow-hidden flex flex-col bg-gray-100 dark:bg-gray-900">
             <nav class="bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700">
@@ -38,10 +53,11 @@ const authUser = usePage().props.auth.user ;
 
                             
                         </div>
+                        
 
                         <div v-if="authUser" class="hidden sm:flex sm:items-center sm:ms-6">
                             <!-- Settings Dropdown -->
-                            <div class="ms-3 relative">
+                            <div class="ms-3 relative flex">
                                 <Dropdown align="right" width="48">
                                     <template #trigger>
                                         <span class="inline-flex rounded-md">
@@ -74,6 +90,31 @@ const authUser = usePage().props.auth.user ;
                                         </DropdownLink>
                                     </template>
                                 </Dropdown>
+                                <Dropdown align="right" width="48">
+                        <template #trigger>
+                            <span class="inline-flex rounded-md">
+                            <button
+                                type="button"
+                                class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-300 focus:outline-none transition ease-in-out duration-150"
+                            >
+                                Notifications
+                            </button>
+                            </span>
+                        </template>
+
+                        <template #content>
+                            <ul>
+                            <li v-for="(notification, index) in displayedNotifications" :key="index">
+                                {{ notification.data.text }}
+                            </li>
+                            <li v-if="!allNotificationsLoaded">
+                                <button @click="loadMoreNotifications" class="text-gray-500 hover:text-gray-700 focus:outline-none">
+                                Read more
+                                </button>
+                            </li>
+                            </ul>
+                        </template>
+                        </Dropdown>
                             </div>
                         </div>
 

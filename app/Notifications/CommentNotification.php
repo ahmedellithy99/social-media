@@ -53,7 +53,7 @@ class CommentNotification extends Notification
     public function toArray(object $notifiable): array
     {
         return [
-            'notification-text' => $this->commentedUser . " Comment on " . substr($this->postBody, 0 , 10),
+            'text' => $this->commentedUser . " Comment on " . substr($this->postBody, 0 , 10),
             'post_id' => $this->postId
         ];
     }

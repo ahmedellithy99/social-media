@@ -53,7 +53,7 @@ class ReactionNotification extends Notification
     public function toArray(object $notifiable): array
     {
         return [
-            'notification-text' => $this->reactedUser . " Liked " . substr($this->postBody, 0 , 10),
+            'text' => $this->reactedUser . " Liked " . substr($this->postBody, 0 , 10),
             'post_id' => $this->postId
         ];
     }
