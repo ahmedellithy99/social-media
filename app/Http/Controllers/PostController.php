@@ -6,6 +6,7 @@ use App\Http\Enums\PostReactionEnum;
 use App\Http\Requests\PostRequest;
 use App\Http\Requests\UpdatePostRequest;
 use App\Http\Resources\CommentResource;
+use App\Http\Resources\PostResource;
 use App\Models\Comment;
 use App\Models\Post;
 use App\Models\PostAttachment;
@@ -20,12 +21,29 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
+use Inertia\Inertia;
+
 
 use function Laravel\Prompts\error;
 
 class PostController extends Controller
 {
 
+    /**
+     * Show specific post.
+     */
+    public function show(Post $post)
+    {
+        $post->loadCount('reactions')->load([
+            'comments' => function ($query) {
+                $query->withCount('reactions'); // SELECT * FROM comments WHERE post_id IN (1, 2, 3...)
+                // SELECT COUNT(*) from reactions
+            },
+        ])->loadCount('comments');
+
+        $notifications = auth()->user()->unReadNotifications;
+        return Inertia::render('Post/View' , ['post' => new PostResource($post) , 'notifications' => $notifications]);
+    }
     
     /**
      * Store a newly created resource in storage.

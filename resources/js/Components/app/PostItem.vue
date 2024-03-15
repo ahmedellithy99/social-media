@@ -86,6 +86,10 @@ function commentReaction(comment)
         })
 }
 
+function getPost()
+{
+    router.get(route('post.show' ,props.post));
+}
 
 
 </script>
@@ -98,7 +102,6 @@ function commentReaction(comment)
     <div class="flex items-center justify-between mb-3">
         <PostUserHeader :post="post" />
         <Menu as="div" class="relative z-10 inline-block text-left">
-        
             <div>
                 <MenuButton
                     class="w-8 h-8 rounded-full hover:bg-black/5 transition flex items-center justify-center"
@@ -160,7 +163,7 @@ function commentReaction(comment)
     </div>
 
         <!-- Post Content -->
-    <div class="mb-3">
+    <div class="mb-3 cursor-pointer" @click="getPost">
     <ReadMoreReadLess :content="post.body" />
     </div>
 
@@ -173,6 +176,10 @@ function commentReaction(comment)
                 @click="openAttachment(ind)"
                 class=" group max-h-[250px] bg-blue-100 flex flex-col items-center justify-center text-gray-500 relative cursor-pointer"
             >
+            <div v-if="ind === 3 && post.attachments.length > 4"
+                        class="absolute left-0 top-0 right-0 bottom-0 z-10 bg-black/60 text-white flex items-center justify-center text-2xl">
+                        +{{ post.attachments.length - 4 }} more
+                    </div>
                 <!-- Download Button -->
                 <button
                 class="z-20 opacity-0 group-hover:opacity-100 transition-all w-8 h-8 flex items-center justify-center text-gray-100 bg-gray-700 rounded absolute right-2 top-2 cursor-pointer hover:bg-gray-800"

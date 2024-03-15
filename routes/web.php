@@ -21,10 +21,14 @@ use Inertia\Inertia;
 Route::get('/' , [HomeController::class , 'index']);
 
 Route::middleware('auth')->group(function () {
+    //Profile
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
+
+    // Post 
+    Route::get('/post/{post}' , [PostController::class , 'show'] )->name('post.show');
     Route::post('/post' , [PostController::class , 'store'] )->name('post.store');
     Route::put('/post/{post}' , [PostController::class , 'update'])->name('post.update');
     Route::delete('/post/{post}' , [PostController::class , 'destroy'])->name('post.delete');
@@ -33,7 +37,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/post/{comment}/comment' , [PostController::class , 'deleteComment'])->name('delete.comment');
     Route::post('/post/{comment}/reactions' , [PostController::class , 'commentReaction'])->name('comment.reaction');
 
-    
+
 
 });
 

@@ -15,7 +15,7 @@ const props = defineProps({
 <template>
     <Head title="Social Media Website" />
     
-    <AuthenticatedLayout :notifications="props.notifications">
+    <AuthenticatedLayout :notifications="notifications">
         <div class="grid lg:grid-cols-12 gap-3 p-4 h-full">
             <div class="lg:col-span-3 lg:order-1 h-full overflow-hidden">
                 <GroupList/>
