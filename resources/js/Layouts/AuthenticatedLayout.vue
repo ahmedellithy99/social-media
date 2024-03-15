@@ -10,6 +10,7 @@ import { Link , usePage } from '@inertiajs/vue3';
 
 
 const showingNavigationDropdown = ref(false);
+const showingNotificationDropdown = ref(false); 
 
 const authUser = usePage().props.auth.user ;
 
@@ -80,16 +81,14 @@ const props = defineProps({
                                 </Dropdown>
                                 <Dropdown align="right" width="48">
                                     <template #trigger>
-                                        <span class="inline-flex rounded-md">
-                                            <button
-                                                type="button"
-                                                class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-300 focus:outline-none transition ease-in-out duration-150"
+                                        <div class="inline-flex rounded-md">
+                                            <button type="button" class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-300 focus:outline-none transition ease-in-out duration-150">
                                             >
                                                 Notifications
 
                                                 
                                             </button>
-                                        </span>
+                                        </div>
                                     </template>
                                     
                                     <template #content>
@@ -137,6 +136,20 @@ const props = defineProps({
                                 </svg>
                             </button>
                         </div>
+
+                        <div class="-me-2 flex items-center sm:hidden">
+                        <button
+                            @click="showingNotificationDropdown = !showingNotificationDropdown"
+                            class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 dark:text-gray-500 hover:text-gray-500 dark:hover:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-900 focus:outline-none focus:bg-gray-100 dark:focus:bg-gray-900 focus:text-gray-500 dark:focus:text-gray-400 transition duration-150 ease-in-out"
+                        >
+                        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <!-- Adjust the SVG icon for your notification icon -->
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 18v-6a9 9 0 0118 0v6"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.73 21a2 2 0 01-3.46 0"></path>
+                                    </svg>
+                        </button>
+                        </div>
+
                     </div>
                 </div>
 
@@ -145,6 +158,7 @@ const props = defineProps({
                     :class="{ block: showingNavigationDropdown, hidden: !showingNavigationDropdown }"
                     class="sm:hidden"
                 >
+                
                     
 
                     <!-- Responsive Settings Options -->
@@ -161,6 +175,29 @@ const props = defineProps({
                             <ResponsiveNavLink :href="route('logout')" method="post" as="button">
                                 Log Out
                             </ResponsiveNavLink>
+                        </div>
+                        <div>
+                        </div>
+                    </div>
+                </div>
+
+                <div v-if="showingNotificationDropdown" class="sm:hidden">
+                    <!-- Content for notifications dropdown -->
+                    <div class="h-48 pt-4 pb-1 border-t border-gray-200 dark:border-gray-600 overflow-auto">
+                        <!-- Notification content here -->
+                        <!-- For example: -->
+                        <div class="px-4">
+                            <div class="font-medium text-base text-gray-800 dark:text-gray-200">
+                                Notifications
+                            </div>
+                            <div class="mt-3 space-y-1">
+                                <!-- Notification items -->
+                                <div class="overflow-visible">
+                                    
+                                    <DropdownLink v-for="notification of notifications"> {{notification.data.text}} </DropdownLink>
+                                </div>
+                                
+                            </div>
                         </div>
                     </div>
                 </div>
