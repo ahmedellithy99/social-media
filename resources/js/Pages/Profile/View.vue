@@ -1,5 +1,6 @@
 <script setup>
 import PrimaryButton from '@/Components/PrimaryButton.vue';
+import DangerButton from '@/Components/DangerButton.vue';
 import {TabGroup, TabList, Tab, TabPanels, TabPanel} from '@headlessui/vue';
 import TabItem from "@/Pages/Profile/Partials/TabItem.vue";
 import { usePage , Head , useForm } from '@inertiajs/vue3';
@@ -15,7 +16,8 @@ const authUser = usePage().props.auth.user ;
 const isMyProfile = computed(() => authUser && authUser.id === props.user.id);
 
 const coverImageSrc = ref('');
-const avatarImageSrc = ref('')
+const avatarImageSrc = ref('');
+const isFollwing = ref(false);
 
 const showNotification = ref(true);
 
@@ -25,6 +27,8 @@ const props = defineProps(
         user : Object
         ,
         success : String
+        ,
+        followerCount : Number
     }
 )
 
@@ -96,6 +100,28 @@ function submitAvatarImage() {
     })
 }
 
+function follow()
+{
+    const form = useForm({});
+
+    form.post(route('user.follow', props.user.id), {
+        preserveScroll: true
+    });
+
+    isFollwing.value = true;
+}
+
+function unFollow()
+{
+    const form = useForm({});
+
+    form.post(route('user.unfollow', props.user.id), {
+        preserveScroll: true
+    });
+
+    isFollwing.value = false;
+}
+
 </script>
 
 <template>
@@ -104,22 +130,25 @@ function submitAvatarImage() {
     
     <AuthenticatedLayout>
         
-        
+
         <div class="max-w-[768px] mx-auto h-full overflow-auto">
 
                 <div class="relative bg-white">
+                    <!-- Notification Session -->
                     <div
                             v-show="showNotification && success"
                             class="my-2 py-2 px-3 font-medium text-sm bg-emerald-500 text-white"
                         >
                             {{success}}
-                        </div>
-                        <div
-                            v-if="$page.props.errors.cover"
-                            class="my-2 py-2 px-3 font-medium text-sm bg-red-400 text-white"
-                        >
-                            {{ $page.props.errors.cover }}
-                        </div>
+                    </div>
+                    <!-- Error  -->
+                    <div
+                        v-if="$page.props.errors.cover"
+                        class="my-2 py-2 px-3 font-medium text-sm bg-red-400 text-white"
+                    >
+                        {{ $page.props.errors.cover }}
+                    </div>
+                    <!-- Cover  -->
                     <div class="group">
                         <img :src=" coverImageSrc || user.cover_url || '/img/default-cover.jpg'" class="w-full h-[200px] object-cover rounded " >
 
@@ -145,7 +174,8 @@ function submitAvatarImage() {
                     </div>
                     
                                     
-                    <div class="flex">
+                    <div class="flex items-center">
+                        <!-- Profile Photo -->
                         <div class="flex items-center justify-center relative group/avatar -mt-[64px] ml-[48px] w-[128px] h-[128px] rounded-full">
                         <img :src="avatarImageSrc || user.avatar_url || '/img/avatar.png'"
                             class="w-full h-full object-cover rounded-full">
@@ -168,11 +198,15 @@ function submitAvatarImage() {
                                 class="w-7 h-7 flex items-center justify-center bg-emerald-500/80 text-white rounded-full">
                                 <CheckCircleIcon class="h-5 w-5"/>
                             </button>
-                        </div>
                     </div>
+                    </div>
+                        <!-- Under Cover literally -->
                         <div class="flex justify-between items-center flex-1 p-4">
-                            <h2 class="font-bold text-lg">{{user.name}}</h2>
-                            <div v-if="isMyProfile">
+                            <div>
+                                <h2 class="font-bold text-lg">{{ user.name }}</h2>
+                                <p class="text-xs text-gray-500">{{followerCount}} follower(s)</p>
+                            </div>
+                            <div v-show="isMyProfile">
                                 <PrimaryButton>
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                                         stroke="currentColor" class="w-4 h-4 mr-2">
@@ -184,7 +218,19 @@ function submitAvatarImage() {
                             </div>
                             
                         </div>
+                        <!-- Follow Button -->
+                        <div class="my-auto">
+                            <PrimaryButton @click="follow" v-if="!isFollwing && authUser.id != user.id"> Follow </PrimaryButton>
+                        </div>
+                        <!-- Unfollow Button -->
+                        <div class="my-auto">
+                            <DangerButton @click="unFollow" v-if="isFollwing && authUser.id != user.id"> UnFollow </DangerButton>
+                        </div>
+
+
+
                     </div>
+                    <!-- Tabs -->
                     <div class="border-t">
                         <TabGroup>
                             <TabList class="flex bg-white">

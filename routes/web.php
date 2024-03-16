@@ -3,6 +3,7 @@
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\UserController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -27,6 +28,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
 
+
     // Post 
     Route::get('/post/{post}' , [PostController::class , 'show'] )->name('post.show');
     Route::post('/post' , [PostController::class , 'store'] )->name('post.store');
@@ -37,7 +39,10 @@ Route::middleware('auth')->group(function () {
     Route::delete('/post/{comment}/comment' , [PostController::class , 'deleteComment'])->name('delete.comment');
     Route::post('/post/{comment}/reactions' , [PostController::class , 'commentReaction'])->name('comment.reaction');
 
+    // User
 
+    Route::post('user/follow/{user}' , [UserController::class , 'follow'])->name('user.follow');
+    Route::post('user/unfollow/{user}' , [UserController::class , 'unfollow'])->name('user.unfollow');
 
 });
 
