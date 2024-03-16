@@ -104,7 +104,8 @@ const props = defineProps({
                                         <div class="py-1" role="none">
                                             <div v-for="notification of notifications" class="flex items-center justify-center">
                                             <img :src="notification.data.avatar_url" class="aspect aspect-square max-w-8 max-h-8 rounded-full"/>
-                                            <DropdownLink :href="route('post.show' , notification.data.post_id)"> {{ notification.data.text }} </DropdownLink>
+                                            <DropdownLink v-if="notification.data.post_id" :href="route('post.show' , notification.data.post_id)"> {{ notification.data.text }} </DropdownLink>
+                                            <DropdownLink v-if="notification.data.username" :href="route('profile' , notification.data.username)"> {{ notification.data.text }} </DropdownLink>
                                             </div>
                                         </div>
                                     </div>
@@ -207,9 +208,10 @@ const props = defineProps({
                             </div>
                             <div class="mt-3 space-y-1">
                                 <!-- Notification items -->
-                                <div >
-                                    
-                                    <DropdownLink v-for="notification of notifications"> {{notification.data.text}} </DropdownLink>
+                                <div v-for="notification of notifications" class="flex items-center justify-center">
+                                    <img :src="notification.data.avatar_url" class="aspect aspect-square max-w-8 max-h-8 rounded-full"/>
+                                    <DropdownLink v-if="notification.data.post_id" :href="route('post.show' , notification.data.post_id)"> {{ notification.data.text }} </DropdownLink>
+                                    <DropdownLink v-if="notification.data.username" :href="route('profile' , notification.data.username)"> {{ notification.data.text }} </DropdownLink>
                                 </div>
                                 
                             </div>

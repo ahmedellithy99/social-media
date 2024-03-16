@@ -11,14 +11,13 @@ import Edit from '@/Pages/Profile/Edit.vue';
 
 
 
+
 const authUser = usePage().props.auth.user ;
 
 const isMyProfile = computed(() => authUser && authUser.id === props.user.id);
 
 const coverImageSrc = ref('');
 const avatarImageSrc = ref('');
-const isFollwing = ref(false);
-
 const showNotification = ref(true);
 
 
@@ -28,7 +27,16 @@ const props = defineProps(
         ,
         success : String
         ,
-        followerCount : Number
+        followersCount : Number,
+        
+        followingsCount : Number,
+
+        followers : Array,
+
+        followings : Array,
+        
+        isFollowing: Boolean
+
     }
 )
 
@@ -37,9 +45,6 @@ const imagesForm = useForm({
     cover : null , 
     avatar : null
 });
-
-
-
 
 
 function onAvatarChange(event) {
@@ -108,7 +113,7 @@ function follow()
         preserveScroll: true
     });
 
-    isFollwing.value = true;
+    props.isFollowing = true;
 }
 
 function unFollow()
@@ -119,7 +124,7 @@ function unFollow()
         preserveScroll: true
     });
 
-    isFollwing.value = false;
+    props.isFollowing = false;
 }
 
 </script>
@@ -129,9 +134,7 @@ function unFollow()
     <Head title="Alo"/>
     
     <AuthenticatedLayout>
-        
-
-        <div class="max-w-[768px] mx-auto h-full overflow-auto">
+        <div class="max-w-[768px] mx-auto h-full overflow-auto px-6">
 
                 <div class="relative bg-white">
                     <!-- Notification Session -->
@@ -204,7 +207,8 @@ function unFollow()
                         <div class="flex justify-between items-center flex-1 p-4">
                             <div>
                                 <h2 class="font-bold text-lg">{{ user.name }}</h2>
-                                <p class="text-xs text-gray-500">{{followerCount}} follower(s)</p>
+                                <p class="text-xs text-gray-500">{{followersCount}} follower(s)</p>
+                                <p class="text-xs text-gray-500">{{followingsCount}} following(s)</p>
                             </div>
                             <div v-show="isMyProfile">
                                 <PrimaryButton>
@@ -220,12 +224,14 @@ function unFollow()
                         </div>
                         <!-- Follow Button -->
                         <div class="my-auto">
-                            <PrimaryButton @click="follow" v-if="!isFollwing && authUser.id != user.id"> Follow </PrimaryButton>
+                            <PrimaryButton @click="follow" v-if="!isFollowing && authUser.id != user.id"> Follow </PrimaryButton>
                         </div>
                         <!-- Unfollow Button -->
                         <div class="my-auto">
-                            <DangerButton @click="unFollow" v-if="isFollwing && authUser.id != user.id"> UnFollow </DangerButton>
+                            <DangerButton @click="unFollow" v-if="isFollowing && authUser.id != user.id"> UnFollow </DangerButton>
                         </div>
+
+                        
 
 
 
@@ -258,10 +264,22 @@ function unFollow()
                                     Posts
                                 </TabPanel>
                                 <TabPanel class="bg-white p-3 shadow">
-                                    Followers
+                                        <div v-for="follower of followers" class="flex items-center gap-2 py-2 px-2">
+                                            <a :href="route('profile' , follower.username)" > <img :src="follower.avatar_url" class="w-[32px] h-[32px] rounded-full cursor-pointer" /> </a>
+                                            <div class="flex justify-between flex-1">
+                                                <h3 class="font-black hover:underline cursor-pointer">{{ follower.name }}</h3>
+                                            </div>
+                                        </div>
+                                    
+
                                 </TabPanel>
                                 <TabPanel class="bg-white p-3 shadow">
-                                    Followings
+                                    <div v-for="following of followings" class="flex items-center gap-2 py-2 px-2">
+                                            <a :href="route('profile' , following.username)" > <img :src="following.avatar_url" class="w-[32px] h-[32px] rounded-full cursor-pointer" /> </a>
+                                            <div class="flex justify-between flex-1">
+                                                <h3 class="font-black hover:underline cursor-pointer">{{ following.name }}</h3>
+                                            </div>
+                                        </div>
                                 </TabPanel>
                                 <TabPanel class="bg-white p-3 shadow">
                                     Photos

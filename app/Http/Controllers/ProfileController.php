@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
 use App\Http\Resources\UserResource;
+use App\Models\Follower;
 use App\Models\User;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\RedirectResponse;
@@ -61,8 +62,42 @@ class ProfileController extends Controller
     }
 
     public function index(User $user)
-    {
-        return Inertia::render('Profile/View' , ['user' => new UserResource($user) , 'success' => session('success'), ]);
+    {   
+        $isFollowing = false;
+
+        if(auth()->user()->id != $user->id)
+        {
+            
+            $isFollowing = Follower::where('user_id' , $user->id)->where('follower_id' , auth()->user()->id)->exists();
+        }
+
+        $followers = User::query()
+        ->select('users.*')
+        ->join('followers AS f', 'f.follower_id', 'users.id')
+        ->where('f.user_id', $user->id)
+        ->get();
+
+        $followings = User::query()
+        ->select('users.*')
+        ->join('followers AS f', 'f.user_id', 'users.id')
+        ->where('f.follower_id', $user->id)
+        ->get();
+
+        // return $followers;
+        $followersCount = count($user->followers);
+        $followingsCount = count($user->followings);
+
+        
+        return Inertia::render('Profile/View' , 
+        ['user' => new UserResource($user) ,
+        'success' => session('success'),
+        'followers' => UserResource::collection($followers),
+        'followings' => UserResource::collection($followings),
+        'followersCount' => $followersCount,
+        'followingsCount' => $followingsCount,
+        'isFollowing' => $isFollowing
+        
+        ]);
     }
 
     /**

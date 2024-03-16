@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -55,5 +56,20 @@ class User extends Authenticatable
             ->generateSlugsFrom('name')
             ->saveSlugsTo('username')
             ->doNotGenerateSlugsOnUpdate();
+    }
+
+    public function posts():HasMany
+    {
+        return $this->hasMany(Post::class);
+    }
+
+    public function followers():HasMany
+    {
+        return $this->hasMany(Follower::class);
+    }
+
+    public function followings():HasMany
+    {
+        return $this->hasMany(Follower::class , 'follower_id');
     }
 }
