@@ -10,9 +10,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import Edit from '@/Pages/Profile/Edit.vue';
 import CreatePost from '@/Components/app/CreatePost.vue';
 import PostList from '@/Components/app/PostList.vue';
-
-
-
+import ImageModal from '@/Components/app/ImageModal.vue';
 
 const authUser = usePage().props.auth.user ;
 
@@ -21,6 +19,8 @@ const isMyProfile = computed(() => authUser && authUser.id === props.user.id);
 const coverImageSrc = ref('');
 const avatarImageSrc = ref('');
 const showNotification = ref(true);
+const showProfilePhoto = ref(false);
+const showCoverPhoto = ref(false);
 
 
 const props = defineProps(
@@ -44,11 +44,19 @@ const props = defineProps(
     }
 )
 
-
 const imagesForm = useForm({
     cover : null , 
     avatar : null
 });
+
+function openProfilePhoto()
+{
+    showProfilePhoto.value = true;
+}
+function openCoverPhoto()
+{
+    showCoverPhoto.value = true;
+}
 
 
 function onAvatarChange(event) {
@@ -82,6 +90,11 @@ function onCoverChange(event)
 function resetCoverImgae() {
     imagesForm.cover = null;
     coverImageSrc.value = null
+}
+
+function resetAvatarImage() {
+    imagesForm.avatar = null;
+    avatarImageSrc.value = null
 }
 
 function submitCoverImage()
@@ -137,6 +150,7 @@ function unFollow()
 
     <Head title="Alo"/>
     <AuthenticatedLayout>
+        <ImageModal v-model="showCoverPhoto"  :photo="user.cover_url"/>
         <div class="max-w-[768px] mx-auto h-full overflow-auto px-6">
 
                 <div class="relative bg-white">
@@ -156,7 +170,7 @@ function unFollow()
                     </div>
                     <!-- Cover  -->
                     <div class="group">
-                        <img :src=" coverImageSrc || user.cover_url || '/img/default-cover.jpg'" class="w-full h-[200px] object-cover rounded " >
+                        <img @click="openCoverPhoto" :src=" coverImageSrc || user.cover_url || '/img/default-cover.jpg'" class="w-full h-[200px] object-cover rounded cursor-pointer" >
 
                         <div v-if="!coverImageSrc" class="absolute top-2 right-2"> 
                             <div v-if="authUser.id == user.id">
@@ -179,33 +193,37 @@ function unFollow()
                         </div>
                     </div>
                     
-                                    
+                            
                     <div class="flex items-center">
                         <!-- Profile Photo -->
                         <div class="flex items-center justify-center relative group/avatar -mt-[64px] ml-[48px] w-[128px] h-[128px] rounded-full">
-                        <img :src="avatarImageSrc || user.avatar_url || '/img/avatar.png'"
-                            class="w-full h-full object-cover rounded-full">
-                        <button
-                            v-if="!avatarImageSrc"
-                            class="absolute left-0 top-0 right-0 bottom-0 bg-black/50 text-gray-200 rounded-full opacity-0 flex items-center justify-center group-hover/avatar:opacity-100">
-                            <CameraIcon class="w-8 h-8"/>
-
-                            <input type="file" class="absolute left-0 top-0 bottom-0 right-0 opacity-0"
-                                @change="onAvatarChange"/>
-                        </button>
-                        <div v-else class="absolute top-1 right-0 flex flex-col gap-2">
-                            <button
-                                @click="resetAvatarImage"
-                                class="w-7 h-7 flex items-center justify-center bg-red-500/80 text-white rounded-full">
-                                <XMarkIcon class="h-5 w-5"/>
-                            </button>
-                            <button
-                                @click="submitAvatarImage"
-                                class="w-7 h-7 flex items-center justify-center bg-emerald-500/80 text-white rounded-full">
-                                <CheckCircleIcon class="h-5 w-5"/>
-                            </button>
-                    </div>
-                    </div>
+                            <img @click="openProfilePhoto" :src="avatarImageSrc || user.avatar_url || '/img/avatar.png'"
+                            class="w-full h-full object-cover rounded-full cursor-pointer">
+                            <ImageModal v-model="showProfilePhoto"  :photo="user.avatar_url"/>
+                            
+                            <div v-if="authUser.id == user.id">
+                                <button
+                                    v-if="!avatarImageSrc "
+                                    class="absolute left-0 top-0 right-0 bottom-0 bg-black/50 text-gray-200 rounded-full opacity-0 flex items-center justify-center group-hover/avatar:opacity-100">
+                                    <CameraIcon class="w-8 h-8"/>
+    
+                                    <input type="file" class="absolute left-0 top-0 bottom-0 right-0 opacity-0"
+                                        @change="onAvatarChange"/>
+                                </button>
+                                <div v-else class="absolute top-1 right-0 flex flex-col gap-2">
+                                    <button
+                                        @click="resetAvatarImage"
+                                        class="w-7 h-7 flex items-center justify-center bg-red-500/80 text-white rounded-full">
+                                        <XMarkIcon class="h-5 w-5"/>
+                                    </button>
+                                    <button
+                                        @click="submitAvatarImage"
+                                        class="w-7 h-7 flex items-center justify-center bg-emerald-500/80 text-white rounded-full">
+                                        <CheckCircleIcon class="h-5 w-5"/>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                         <!-- Under Cover literally -->
                         <div class="flex justify-between items-center flex-1 p-4">
                             <div>
