@@ -15,20 +15,8 @@ class HomeController extends Controller
             
             $notifications = auth()->user()->unReadNotifications;
             $userId = auth()->user()->id;
-            $posts = Post::with('attachments')->withCount('reactions')
-                                            ->withCount('comments')
-                                            ->with(['comments' => function($query) use ($userId) {
-                                                $query->withCount('reactions')->with(
-                                                    ['reactions' => function ($query) use ($userId) {
-                                                        $query->where('user_id', $userId);
-                                                    }
-                                            ]);
-                                            }
-                                            ,'reactions' => function ($query) use ($userId) {
-                                                $query->where('user_id', $userId);
-                                            }])
-                                            ->latest()
-                                            ->paginate(5);
+            
+            $posts = Post::items($userId)->latest()->paginate(5);
 
 
                                             

@@ -2,7 +2,7 @@
 import PostItem from "@/Components/app/PostItem.vue";
 import PostModal from "@/Components/app/PostModal.vue";
 import AttachmentModal from "@/Components/app/AttachmentModal.vue";
-import {onUpdated, ref} from "vue";
+import {onUpdated, ref , watch} from "vue";
 import {usePage} from "@inertiajs/vue3";
 import { onMounted } from "vue";
 import axiosClient from "@/axiosClient.js";
@@ -13,10 +13,6 @@ const props =defineProps({
 
 const page = usePage();
 
-const allPosts = ref({
-    data: page.props.posts.data,
-    next: page.props.posts.links.next
-})
 
 const authUser = usePage().props.auth.user;
 const showEditModal = ref(false)
@@ -24,6 +20,21 @@ const showAttachmentsModal = ref(false)
 const previewAttachmentPost = ref({})
 const editPost = ref({})
 const loadMoreIntersect = ref(null)
+const allPosts = ref({
+    data: [],
+    next: null
+})
+
+
+watch(() => page.props.posts, () => {
+    if (page.props.posts) {
+        allPosts.value = {
+            data: page.props.posts.data,
+            next: page.props.posts.links?.next
+        }
+    }
+}, {deep: true, immediate: true})
+
 
 function openEditModal(post) {
     editPost.value = post;
@@ -58,7 +69,8 @@ function loadMore()
 
     axiosClient.get(allPosts.value.next)
         .then(({data}) => {
-            // console.log(data);
+            console.log(allPosts.value);
+            console.log(data.data);
             
             allPosts.value.data = [...allPosts.value.data, ...data.data]
             allPosts.value.next = data.links.next
@@ -87,6 +99,8 @@ onMounted(() => {
         <PostItem v-for="post of allPosts.data" :key="post.id" :post="post"
         @editClick="openEditModal"
         @attachmentClick="openAttachmentPreviewModal"/>
+
+        <button @click="loadMore" class="inline-block px-4 py-2 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-md shadow-md transition duration-300 ease-in-out">Feed Me More</button>
         <!-- <div class="mb-10"></div> -->
         
         <div ref="loadMoreIntersect"></div> 

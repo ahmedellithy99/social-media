@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Http\Resources\PostResource;
 use App\Http\Resources\UserResource;
 use App\Models\Follower;
+use App\Models\Post;
 use App\Models\User;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\RedirectResponse;
@@ -61,14 +63,23 @@ class ProfileController extends Controller
         return back()->with('success', $success);
     }
 
-    public function index(User $user)
+    public function index(Request $request, User $user)
     {   
         $isFollowing = false;
-
+        if(Auth::guest())
+        {
+            return redirect(route('login'));
+        }
         if(auth()->user()->id != $user->id)
         {
             
             $isFollowing = Follower::where('user_id' , $user->id)->where('follower_id' , auth()->user()->id)->exists();
+        }
+
+        $posts = Post::items(auth()->user()->id)->latest()->paginate(10);
+        
+        if ($request->wantsJson()) {
+            return PostResource::collection($posts);
         }
 
         $followers = User::query()
@@ -95,7 +106,8 @@ class ProfileController extends Controller
         'followings' => UserResource::collection($followings),
         'followersCount' => $followersCount,
         'followingsCount' => $followingsCount,
-        'isFollowing' => $isFollowing
+        'isFollowing' => $isFollowing,
+        'posts' => PostResource::collection($posts)
         
         ]);
     }

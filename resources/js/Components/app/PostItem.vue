@@ -237,7 +237,7 @@ function getPost()
                 <!-- Comment Content -->
                 <div class="flex items-start">
                 <!-- User Avatar -->
-                <img :src="comment.user.avatar_url" alt="User Avatar" class="rounded-full w-10 h-10 mr-2" />
+                <a :href="route('profile' , comment.user.username)"><img :src="comment.user.avatar_url" alt="User Avatar" class="rounded-full w-10 h-10 mr-2" /></a>
                 <!-- Comment Details -->
                 <div>
                     

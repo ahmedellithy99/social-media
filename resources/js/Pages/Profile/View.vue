@@ -8,6 +8,8 @@ import { computed , ref } from 'vue';
 import {XMarkIcon, CheckCircleIcon, CameraIcon} from '@heroicons/vue/24/solid'
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import Edit from '@/Pages/Profile/Edit.vue';
+import CreatePost from '@/Components/app/CreatePost.vue';
+import PostList from '@/Components/app/PostList.vue';
 
 
 
@@ -35,7 +37,9 @@ const props = defineProps(
 
         followings : Array,
         
-        isFollowing: Boolean
+        isFollowing: Boolean,
+
+        posts : Array
 
     }
 )
@@ -132,7 +136,6 @@ function unFollow()
 <template>
 
     <Head title="Alo"/>
-    
     <AuthenticatedLayout>
         <div class="max-w-[768px] mx-auto h-full overflow-auto px-6">
 
@@ -261,7 +264,8 @@ function unFollow()
                             <TabPanels class="mt-2">
                                 
                                 <TabPanel class="bg-white p-3 shadow">
-                                    Posts
+                                    <CreatePost/>
+                                    <PostList class="flex-1" :posts="posts" />
                                 </TabPanel>
                                 <TabPanel class="bg-white p-3 shadow">
                                         <div v-for="follower of followers" class="flex items-center gap-2 py-2 px-2">

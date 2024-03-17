@@ -10,15 +10,15 @@ defineProps({
 })
 </script>
 
-<template>
+<template>  
     <div class="flex items-center gap-2 ">
-        <a href="javascript:void(0)">
+        <a :href="route('profile' , post.user.username )">
             <img :src="post.user.avatar_url"
                 class="w-[40px] rounded-full border-2 transition-all hover:border-blue-500"/>
         </a>
         <div>
             <h4 class="font-bold">
-                <a href="javascript:void(0)" class="hover:underline">{{ post.user.name }}</a>
+                <a :href="route('profile' , post.user.username )" class="hover:underline">{{ post.user.name }}</a>
                 <template v-if="post.group">
                     >
                     <a href="javascript:void(0)" class="hover:underline">{{ post.group.name }}</a>
