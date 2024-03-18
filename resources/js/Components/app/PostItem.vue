@@ -7,7 +7,7 @@ import {ChatBubbleLeftRightIcon, HandThumbUpIcon, ArrowDownTrayIcon} from '@hero
 import {ref} from "vue";
 import PostUserHeader from "@/Components/app/PostUserHeader.vue";
 import { router, usePage } from '@inertiajs/vue3';
-import {isImage} from '@/helpers.js';
+import {isImage , isVideo} from '@/helpers.js';
 import axiosClient from '@/axiosClient.js';
 import ReadMoreReadLess from '@/Components/app/ReadMoreReadLess.vue';
 import InputTextarea from '../InputTextarea.vue';
@@ -174,7 +174,7 @@ function getPost()
             <!-- Attachment Item -->
             <div
                 @click="openAttachment(ind)"
-                class=" group max-h-[250px] bg-blue-100 flex flex-col items-center justify-center text-gray-500 relative cursor-pointer"
+                class=" group  bg-blue-100 flex flex-col items-center justify-center text-gray-500 relative cursor-pointer"
             >
             <div v-if="ind === 3 && post.attachments.length > 4"
                         class="absolute left-0 top-0 right-0 bottom-0 z-10 bg-black/60 text-white flex items-center justify-center text-2xl">
@@ -188,6 +188,18 @@ function getPost()
                 </button>
         <!-- Image or Icon -->
             <img v-if="isImage(attachment)" :src="attachment.url" class="w-full h-full" alt="Attachment" />
+            <div v-else-if="isVideo(attachment)" class="relative flex justify-center items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                    stroke="currentColor"
+                    class="z-20 absolute w-16 h-16  text-white opacity-70">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M15.91 11.672a.375.375 0 010 .656l-5.603 3.113a.375.375 0 01-.557-.328V8.887c0-.286.307-.466.557-.327l5.603 3.112z"/>
+                </svg>
+
+                <div class="absolute left-0 top-0 w-full h-full bg-black/50 z-10"></div>
+                <video :src="attachment.url"></video>
+            </div>
             <template v-else>
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-12 h-12">
                     <path d="M5.625 1.5c-1.036 0-1.875.84-1.875 1.875v17.25c0 1.035.84 1.875 1.875 1.875h12.75c1.035 0 1.875-.84 1.875-1.875V12.75A3.75 3.75 0 0016.5 9h-1.875a1.875 1.875 0 01-1.875-1.875V5.25A3.75 3.75 0 009 1.5H5.625z" />
