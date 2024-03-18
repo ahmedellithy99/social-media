@@ -17,8 +17,8 @@ class HomeController extends Controller
             $notifications = auth()->user()->unReadNotifications;
             $userId = auth()->user()->id;
             
-            $posts = Post::items($userId)->join('followers AS f' , function ($join) {
-                $join->on('posts.user_id' , '=' , 'f.user_id')->where('f.follower_id', '=', 2);
+            $posts = Post::items($userId)->join('followers AS f' , function ($join) use ($userId) {
+                $join->on('posts.user_id' , '=' , 'f.user_id')->where('f.follower_id', '=', $userId);
             })
             ->latest()->paginate(5);
 

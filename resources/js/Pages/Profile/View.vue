@@ -11,6 +11,7 @@ import Edit from '@/Pages/Profile/Edit.vue';
 import CreatePost from '@/Components/app/CreatePost.vue';
 import PostList from '@/Components/app/PostList.vue';
 import ImageModal from '@/Components/app/ImageModal.vue';
+import UsersListItem from '@/Components/app/UsersListItem.vue';
 
 const authUser = usePage().props.auth.user ;
 
@@ -150,6 +151,7 @@ function unFollow()
 
     <Head title="Alo"/>
     <AuthenticatedLayout>
+        
         <ImageModal v-model="showCoverPhoto"  :photo="user.cover_url"/>
         <div class="max-w-[768px] mx-auto h-full overflow-auto px-6">
 
@@ -286,22 +288,10 @@ function unFollow()
                                     <PostList class="flex-1" :posts="posts" />
                                 </TabPanel>
                                 <TabPanel class="bg-white p-3 shadow">
-                                        <div v-for="follower of followers" class="flex items-center gap-2 py-2 px-2">
-                                            <a :href="route('profile' , follower.username)" > <img :src="follower.avatar_url" class="w-[32px] h-[32px] rounded-full cursor-pointer" /> </a>
-                                            <div class="flex justify-between flex-1">
-                                                <h3 class="font-black hover:underline cursor-pointer">{{ follower.name }}</h3>
-                                            </div>
-                                        </div>
-                                    
-
+                                    <UsersListItem :users="followers" />
                                 </TabPanel>
                                 <TabPanel class="bg-white p-3 shadow">
-                                    <div v-for="following of followings" class="flex items-center gap-2 py-2 px-2">
-                                            <a :href="route('profile' , following.username)" > <img :src="following.avatar_url" class="w-[32px] h-[32px] rounded-full cursor-pointer" /> </a>
-                                            <div class="flex justify-between flex-1">
-                                                <h3 class="font-black hover:underline cursor-pointer">{{ following.name }}</h3>
-                                            </div>
-                                        </div>
+                                    <UsersListItem :users="followings" />
                                 </TabPanel>
                                 <TabPanel class="bg-white p-3 shadow">
                                     Photos

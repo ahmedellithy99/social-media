@@ -3,6 +3,7 @@
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\SearchController;
 use App\Http\Controllers\UserController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -19,7 +20,7 @@ use Inertia\Inertia;
 |
 */
 
-Route::get('/' , [HomeController::class , 'index']);
+Route::get('/' , [HomeController::class , 'index'])->name('home');
 
 Route::middleware('auth')->group(function () {
     //Profile
@@ -43,6 +44,10 @@ Route::middleware('auth')->group(function () {
 
     Route::post('user/follow/{user}' , [UserController::class , 'follow'])->name('user.follow');
     Route::post('user/unfollow/{user}' , [UserController::class , 'unfollow'])->name('user.unfollow');
+    
+    // Search
+    Route::get('/search/users/{username?}', [SearchController::class, 'searchUser'])
+        ->name('search.users');
 
 });
 
