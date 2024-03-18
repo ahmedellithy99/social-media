@@ -76,7 +76,10 @@ class ProfileController extends Controller
             
             $isFollowing = Follower::where('user_id' , $user->id)->where('follower_id' , auth()->user()->id)->exists();
         }
+        $notifications = auth()->user()->unReadNotifications;
+
         $filter = request('search');
+        
         $posts = Post::items(auth()->user()->id)
                         ->when(request('search') , function($query , $search){
                             $query->where('body' , 'like' , "%$search%");
@@ -107,7 +110,8 @@ class ProfileController extends Controller
         'followingsCount' => $followingsCount,
         'isFollowing' => $isFollowing,
         'posts' => PostResource::collection($posts),
-        'filter' => $filter
+        'filter' => $filter,
+        'notifications' => $notifications
         
         ]);
     }

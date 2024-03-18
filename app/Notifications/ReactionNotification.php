@@ -56,7 +56,7 @@ class ReactionNotification extends Notification
     public function toArray(object $notifiable): array
     {
         return [
-            'text' => $this->reactedUser . " Liked Your Post: " . substr($this->postBody, 0 , 10),
+            'text' => $this->reactedUser . " Liked Your Post: " . (substr($this->postBody, 0 , 10) ?: '' ),
             'avatar_url' => Storage::url($this->avatar_path),
             'post_id' => $this->postId
         ];

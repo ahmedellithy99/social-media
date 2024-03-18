@@ -45,7 +45,9 @@ const props = defineProps(
 
         posts : Array,
 
-        filter : String
+        filter : String, 
+
+        notifications : Array
 
 
     }
@@ -166,7 +168,7 @@ watch(search , debounce (function(value){
 
 
     <Head title="Alo"/>
-    <AuthenticatedLayout>
+    <AuthenticatedLayout :notifications="notifications" >
         
         <ImageModal v-model="showCoverPhoto"  :photo="user.cover_url"/>
         <div class="max-w-[768px] mx-auto h-full overflow-auto px-6">
@@ -188,7 +190,7 @@ watch(search , debounce (function(value){
                     </div>
                     <!-- Cover  -->
                     <div class="group">
-                        <img @click="openCoverPhoto" :src=" coverImageSrc || user.cover_url || '/img/default-cover.jpg'" class="w-full h-[200px] object-cover rounded cursor-pointer" >
+                        <img @click="openCoverPhoto" :src=" coverImageSrc || user.cover_url || '/img/default-cover.jpg'" class="w-full h-[200px] object-cover rounded cursor-pointer z-30" >
 
                         <div v-if="!coverImageSrc" class="absolute top-2 right-2"> 
                             <div v-if="authUser.id == user.id">
