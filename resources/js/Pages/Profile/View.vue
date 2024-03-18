@@ -3,8 +3,8 @@ import PrimaryButton from '@/Components/PrimaryButton.vue';
 import DangerButton from '@/Components/DangerButton.vue';
 import {TabGroup, TabList, Tab, TabPanels, TabPanel} from '@headlessui/vue';
 import TabItem from "@/Pages/Profile/Partials/TabItem.vue";
-import { usePage , Head , useForm } from '@inertiajs/vue3';
-import { computed , ref } from 'vue';
+import { usePage , Head , useForm, router } from '@inertiajs/vue3';
+import { computed , ref, watch } from 'vue';
 import {XMarkIcon, CheckCircleIcon, CameraIcon} from '@heroicons/vue/24/solid'
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import Edit from '@/Pages/Profile/Edit.vue';
@@ -12,6 +12,9 @@ import CreatePost from '@/Components/app/CreatePost.vue';
 import PostList from '@/Components/app/PostList.vue';
 import ImageModal from '@/Components/app/ImageModal.vue';
 import UsersListItem from '@/Components/app/UsersListItem.vue';
+import TextInput from '@/Components/TextInput.vue';
+import { debounce } from 'lodash';
+
 
 const authUser = usePage().props.auth.user ;
 
@@ -40,7 +43,10 @@ const props = defineProps(
         
         isFollowing: Boolean,
 
-        posts : Array
+        posts : Array,
+
+        filter : String
+
 
     }
 )
@@ -145,9 +151,19 @@ function unFollow()
     props.isFollowing = false;
 }
 
+const search = ref(props.filter);
+
+watch(search , debounce (function(value){
+    {
+    router.get('/u/'+ props.user.username +'?search=' + value );
+}
+} , 1500));
+
+
 </script>
 
 <template>
+
 
     <Head title="Alo"/>
     <AuthenticatedLayout>
@@ -195,7 +211,7 @@ function unFollow()
                         </div>
                     </div>
                     
-                            
+                    
                     <div class="flex items-center">
                         <!-- Profile Photo -->
                         <div class="flex items-center justify-center relative group/avatar -mt-[64px] ml-[48px] w-[128px] h-[128px] rounded-full">
@@ -284,6 +300,8 @@ function unFollow()
                             <TabPanels class="mt-2">
                                 
                                 <TabPanel class="bg-white p-3 shadow">
+                                    <TextInput v-model="search" 
+                                    class="mb-4" placeholder="Search For Posts"/>
                                     <CreatePost v-if="authUser.id == user.id"/>
                                     <PostList class="flex-1" :posts="posts" />
                                 </TabPanel>

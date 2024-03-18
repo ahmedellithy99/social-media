@@ -20,6 +20,7 @@ const showAttachmentsModal = ref(false)
 const previewAttachmentPost = ref({})
 const editPost = ref({})
 const loadMoreIntersect = ref(null)
+
 const allPosts = ref({
     data: [],
     next: null
@@ -96,11 +97,12 @@ onMounted(() => {
 <template>
     
     <div class="overflow-auto">
+
         <PostItem v-for="post of allPosts.data" :key="post.id" :post="post"
         @editClick="openEditModal"
         @attachmentClick="openAttachmentPreviewModal"/>
 
-        <button  @click="loadMore" class="inline-block px-4 py-2 bg-green-500 hover:bg-green-600
+        <button v-if="allPosts.next" @click="loadMore" class="inline-block px-4 py-2 bg-green-500 hover:bg-green-600
         text-white font-semibold rounded-md shadow-md transition duration-300 ease-in-out">Feed Me More</button>
         <!-- <div class="mb-10"></div> -->
         
