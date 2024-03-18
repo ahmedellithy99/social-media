@@ -45,8 +45,8 @@ Route::middleware('auth')->group(function () {
     Route::post('user/follow/{user}' , [UserController::class , 'follow'])->name('user.follow');
     Route::post('user/unfollow/{user}' , [UserController::class , 'unfollow'])->name('user.unfollow');
     
-    // Search
-    Route::get('/search/users/{username?}', [SearchController::class, 'searchUser'])
+    // Search From Nav Bar
+    Route::get('/users', [SearchController::class, 'userSearch'])
         ->name('search.users');
 
 });

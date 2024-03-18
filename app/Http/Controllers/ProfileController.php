@@ -76,7 +76,9 @@ class ProfileController extends Controller
             $isFollowing = Follower::where('user_id' , $user->id)->where('follower_id' , auth()->user()->id)->exists();
         }
 
-        $posts = Post::items(auth()->user()->id)->latest()->paginate(10);
+        $posts = Post::items(auth()->user()->id)
+                        ->where('user_id' , $user->id)
+                        ->latest()->paginate(10);
         
         if ($request->wantsJson()) {
             return PostResource::collection($posts);

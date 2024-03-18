@@ -19,3 +19,4 @@ yarn-error.log
 /.vscode
 resources/js/Components/app/old.vue
 resources/js/Components/app/added.vue
+resources/js/Components/app/Paginator.vue

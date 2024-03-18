@@ -9,18 +9,21 @@ use Inertia\Inertia;
 
 class SearchController extends Controller
 {
-    public function searchUser(Request $request , string $username = null)
+    public function userSearch(Request $request)
     {
-        if (!$username)
-            return redirect(route('home'));
-
         $users = User::query()
-        ->where('name', 'like', "%$username%")
-        ->orWhere('username', 'like', "%$username%")
+        ->when(request('search') , function($query , $search)
+        {
+            $query->where('name', 'like', "%$search%")
+            ->orWhere('username', 'like', "%$search%");
+        }
+        )
         ->latest()
-        ->get();
-        
-        return Inertia::render('Search/Users' ,['users' => UserResource::collection($users)]);
+        ->paginate(5);
+
+        return Inertia::render('Search/Users' ,['users' => UserResource::collection($users) 
+        , 'filter' => request('search') ]);
     }
+
 
 }

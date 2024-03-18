@@ -284,7 +284,7 @@ function unFollow()
                             <TabPanels class="mt-2">
                                 
                                 <TabPanel class="bg-white p-3 shadow">
-                                    <CreatePost/>
+                                    <CreatePost v-if="authUser.id == user.id"/>
                                     <PostList class="flex-1" :posts="posts" />
                                 </TabPanel>
                                 <TabPanel class="bg-white p-3 shadow">

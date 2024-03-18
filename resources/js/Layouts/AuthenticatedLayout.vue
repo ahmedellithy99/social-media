@@ -12,7 +12,7 @@ import TextInput from '@/Components/TextInput.vue';
 const showingNavigationDropdown = ref(false);
 const showingNotificationDropdown = ref(false);
 const showProfileDropdown = ref(false); 
-const keywords = ref(usePage().props.search);
+const keywords = ref('');
 const authUser = usePage().props.auth.user ;
 
 const props = defineProps({
@@ -21,7 +21,7 @@ const props = defineProps({
 
 function search()
 {
-    router.get(route('search.users' , keywords.value));
+    router.get('/users?search='+ keywords.value);
 }
 
 
@@ -31,8 +31,7 @@ function search()
 
 
     
-    <div class="overflow-auto">
-        
+    <div class="overflow-auto">   
         <div class="h-screen overflow-hidden flex flex-col bg-gray-100 dark:bg-gray-900">
             <nav class="bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700">
                 <!-- Primary Navigation Menu -->
