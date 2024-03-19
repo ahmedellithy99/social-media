@@ -13,18 +13,21 @@ class ReactionNotification extends Notification
     use Queueable;
 
     public $reactedUser ;
-    public $postBody;
+    public $reactedId;
     public $postId;
-    public $avatar_path;
+    public $postBody;
+
+    
     /**
      * Create a new notification instance.
      */
-    public function __construct($reactedUser , $postBody , $postId , $avatar_path)
+    public function __construct($reactedUser , $reactedId , $postId , $postBody )
     {
         $this->reactedUser = $reactedUser ;
-        $this->postBody = $postBody ;
         $this->postId = $postId;
-        $this->avatar_path = $avatar_path;
+        $this->reactedId = $reactedId;
+        $this->postBody = $postBody;
+        
     }
 
     /**
@@ -56,9 +59,10 @@ class ReactionNotification extends Notification
     public function toArray(object $notifiable): array
     {
         return [
-            'text' => $this->reactedUser . " Liked Your Post: " . (substr($this->postBody, 0 , 10) ?: '' ),
-            'avatar_url' => Storage::url($this->avatar_path),
-            'post_id' => $this->postId
+            'text' => $this->reactedUser . " Liked Your Post: " .substr($this->postBody , 0 , 10) ?? '',
+            'post_id' => $this->postId ,
+            'user_id' => $this->reactedId,
+
         ];
     }
 }

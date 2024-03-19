@@ -13,15 +13,15 @@ class FollowNotification extends Notification implements ShouldQueue
     use Queueable ;
     
     public $reactedUser ;
-    public $avatar_path;
+    public $userId;
     public $username;
     /**
      * Create a new notification instance.
      */
-    public function __construct($reactedUser , $avatar_path , $username)
+    public function __construct($reactedUser ,  $username , $userId )
     {   
         $this->reactedUser = $reactedUser ;
-        $this->avatar_path = $avatar_path;
+        $this->userId = $userId;
         $this->username = $username;
     }
 
@@ -55,7 +55,7 @@ class FollowNotification extends Notification implements ShouldQueue
     {
         return [
             'text' => $this->reactedUser . " is following You" ,
-            'avatar_url' => Storage::url($this->avatar_path),
+            'user_id' => $this->userId,
             'username' => $this->username,
         ];
     }

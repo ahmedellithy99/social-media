@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\NotificationResource;
 use App\Http\Resources\PostResource;
 use App\Http\Resources\UserResource;
 use App\Models\Post;
@@ -12,9 +13,12 @@ class HomeController extends Controller
 {
     public function index(Request $request)
     {   
+
         if(isset(auth()->user()->id)){
             
-            $notifications = auth()->user()->unReadNotifications;
+            $notifications = auth()->user()->notifications;
+
+            // return NotificationResource::collection($notifications);
             $userId = auth()->user()->id;
             
             $posts = Post::items($userId)
@@ -33,7 +37,8 @@ class HomeController extends Controller
                 return $posts;
         }
             return Inertia::render('Home' , ['posts' => $posts , 
-            'notifications' => $notifications ,
+            'notifications' => NotificationResource::collection($notifications)
+            ,
             'followings' => $followings ] );
         }
 

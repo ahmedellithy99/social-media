@@ -19,7 +19,7 @@ class UserController extends Controller
             'follower_id' => auth()->user()->id
         ]);
         
-        Notification::send($user , new FollowNotification($authUser->name , $authUser->avatar_path, $authUser->username ));
+        Notification::send($user , new FollowNotification($authUser->name , $authUser->username , $authUser->id));
 
         return back();
 
@@ -34,4 +34,6 @@ class UserController extends Controller
         return back();
 
     }
+
+
 }

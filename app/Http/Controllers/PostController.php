@@ -98,7 +98,7 @@ class PostController extends Controller
             throw $e;
         }
 
-        return back();
+        return redirect(route('post.show', $post) );
         
     }
 
@@ -219,7 +219,7 @@ class PostController extends Controller
             );
             if($user->id != $post->user->id)
             {
-                Notification::send($post->user , new ReactionNotification($user->name , $post->body , $post->id , $user->avatar_path));
+                Notification::send($post->user , new ReactionNotification($user->name , $user->id , $post->id , $post->body ));
 
             }
         }
@@ -248,7 +248,7 @@ class PostController extends Controller
         if($author->id != $user->id)
         {   
 
-            Notification::send($author , new CommentNotification($user->name , $post->body, $post->id ,$user->avatar_path));
+            Notification::send($author , new CommentNotification($user->name , $post->body, $post->id ,$user->id));
         }
         return response(new CommentResource($comment) , 201);
     }

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Http\Resources\NotificationResource;
 use App\Http\Resources\PostResource;
 use App\Http\Resources\UserResource;
 use App\Models\Follower;
@@ -111,7 +112,7 @@ class ProfileController extends Controller
         'isFollowing' => $isFollowing,
         'posts' => PostResource::collection($posts),
         'filter' => $filter,
-        'notifications' => $notifications
+        'notifications' => NotificationResource::collection($notifications)
         
         ]);
     }
