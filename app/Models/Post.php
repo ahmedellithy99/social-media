@@ -46,9 +46,9 @@ class Post extends Model
     {
         $query->with('attachments')->withCount('reactions')
         ->withCount('comments')
-        ->with(['comments' => function($query) use ($userId) {
+        ->with(['user','comments' => function($query) use ($userId) {
             $query->withCount('reactions')->with(
-                ['reactions' => function ($query) use ($userId) {
+                ['user','reactions' => function ($query) use ($userId) {
                     $query->where('user_id', $userId);
                 }
         ]);
