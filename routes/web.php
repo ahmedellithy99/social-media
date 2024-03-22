@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ChatController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\ProfileController;
@@ -48,6 +49,11 @@ Route::middleware('auth')->group(function () {
     // Search From Nav Bar
     Route::get('/users', [SearchController::class, 'userSearch'])
         ->name('search.users');
+
+    // Chat 
+
+    Route::get('/chat/{id:subId}' ,[ChatController::class , 'index'] )->name('chat.index');
+    Route::post('/chat/sendMessage' ,[ChatController::class , 'store'] )->name('chat.store');
 
 });
 
