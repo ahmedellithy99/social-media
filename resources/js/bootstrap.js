@@ -26,5 +26,8 @@ window.Echo = new Echo({
     wsHost: window.location.hostname,
     wsPort: 6001,
     forceTLS: false,
+    cluster: "mt1",
     disableStatus: true,
 });
+
+// console.log(window.Echo);

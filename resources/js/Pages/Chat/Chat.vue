@@ -1,13 +1,15 @@
 <script setup>
-import { ref } from "vue";
 import { useForm, usePage } from "@inertiajs/vue3";
+import { ref, onMounted, onUpdated } from "vue";
 
 const props = defineProps({
     chat: Object,
+    sender: Object,
+    recipient: Object,
 });
 
 const authUser = usePage().props.auth.user.id;
-const chat_id = props.chat[0]["id"];
+const chat_id = props.chat["id"];
 const form = useForm({
     body: "",
     chat_id: chat_id,
@@ -24,40 +26,82 @@ function sendMessage() {
         },
     });
 }
+const chatContainer = ref(null);
+
+onMounted(scrollToBottom);
+onUpdated(scrollToBottom);
+
+function scrollToBottom() {
+    if (chatContainer.value) {
+        chatContainer.value.scrollTop = chatContainer.value.scrollHeight;
+    }
+}
+
+Echo.join("chat." + chat_id).listen("SendMessage", (e) => {
+    props.chat.messages.push(e["message"]);
+});
 </script>
 
 <template>
     <section class="container mx-auto my-8 p-4 bg-white rounded-lg shadow-lg">
-        <h2 class="text-2xl font-bold mb-4">Conversation Chat</h2>
-        <div class="overflow-y-auto h-80 border rounded-lg border-gray-300 p-4">
+        <h2 class="text-2xl font-bold mb-4">
+            <a :href="route('profile', recipient.username)">{{
+                recipient.name
+            }}</a>
+        </h2>
+        <div
+            class="overflow-y-auto h-80 border rounded-lg border-gray-300 p-4"
+            ref="chatContainer"
+        >
             <!-- Chat Messages -->
             <div
-                v-for="message of chat[0]['messages']"
+                v-for="message of chat['messages']"
+                :key="message.id"
                 class="flex flex-col space-y-4"
             >
                 <!-- Message from sender -->
-
                 <div
                     v-if="authUser == message.sender_id"
-                    class="flex items-center justify-end mb-1"
+                    class="flex items-start justify-end mb-1"
                 >
-                    <div
-                        class="bg-blue-500 text-white py-2 px-4 rounded-lg max-w-xs"
-                    >
-                        {{ message.body }}
+                    <div class="flex flex-col items-end">
+                        <div
+                            class="bg-blue-500 text-white py-2 px-4 rounded-lg max-w-sm"
+                        >
+                            <span>{{ message.body }}</span>
+                        </div>
+                        <span class="text-xs text-gray-400 mt-1">{{
+                            message.date
+                        }}</span>
                     </div>
+                    <img
+                        :src="sender.avatar_url"
+                        alt="User Avatar"
+                        class="w-8 h-8 ml-2 rounded-full"
+                    />
                 </div>
                 <!-- Message from receiver -->
-                <div v-else class="flex items-center">
-                    <div
-                        class="bg-gray-200 text-gray-700 py-2 px-4 rounded-lg max-w-xs"
-                    >
-                        {{ message.body }}
+                <div v-else class="flex items-start mb-1">
+                    <img
+                        :src="recipient.avatar_url"
+                        alt="User Avatar"
+                        class="w-8 h-8 mr-2 rounded-full"
+                    />
+                    <div class="flex flex-col">
+                        <div
+                            class="bg-gray-200 text-gray-700 py-2 px-4 rounded-lg max-w-sm"
+                        >
+                            <span>{{ message.body }}</span>
+                        </div>
+                        <span class="text-xs text-gray-400 mt-1">{{
+                            message.date
+                        }}</span>
                     </div>
                 </div>
                 <!-- Add more messages as needed -->
             </div>
         </div>
+
         <!-- Message Input -->
         <form class="mt-4">
             <div class="flex">

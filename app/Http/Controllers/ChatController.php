@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\SendMessage;
 use App\Http\Resources\UserResource;
 use App\Models\Chat;
 use App\Models\Message;
@@ -39,11 +40,13 @@ class ChatController extends Controller
             'chat_id' => 'exists:chats,id'
         ]);
         // return $data['chat_id'];
-        Message::create([
+        $message =Message::create([
             'sender_id' => auth()->user()->id,
             'body' => $data['body'],
             'chat_id' => $data['chat_id']
         ]);
+        // BroadcastHere 
+        broadcast(new SendMessage($data['chat_id'] , $message));
 
         return back();   
     }
