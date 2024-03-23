@@ -51,8 +51,7 @@ Route::middleware('auth')->group(function () {
         ->name('search.users');
 
     // Chat 
-
-    Route::get('/chat/{id:subId}' ,[ChatController::class , 'index'] )->name('chat.index');
+    Route::get('/chat/{chat:subId}' ,[ChatController::class , 'index'] )->name('chat.index');
     Route::post('/chat/sendMessage' ,[ChatController::class , 'store'] )->name('chat.store');
 
 });

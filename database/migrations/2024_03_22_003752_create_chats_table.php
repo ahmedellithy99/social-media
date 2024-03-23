@@ -14,6 +14,8 @@ return new class extends Migration
         Schema::create('chats', function (Blueprint $table) {
             $table->id();
             $table->text('subId');
+            $table->foreignId('A')->constrained('users');
+            $table->foreignId('B')->constrained('users');
         });
     }
 
