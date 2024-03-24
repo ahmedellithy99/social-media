@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use App\Http\Enums\PostReactionEnum;
 use App\Http\Requests\PostRequest;
 use App\Http\Requests\UpdatePostRequest;
+use App\Http\Resources\ChatResource;
 use App\Http\Resources\CommentResource;
 use App\Http\Resources\PostResource;
+use App\Models\Chat;
 use App\Models\Comment;
 use App\Models\Post;
 use App\Models\PostAttachment;
@@ -34,6 +36,9 @@ class PostController extends Controller
      */
     public function show(Post $post)
     {
+        $authId = auth()->user()->id;
+
+        // Loading certain post 
         $post->loadCount('reactions')->load([
             'comments' => function ($query) {
                 $query->withCount('reactions'); // SELECT * FROM comments WHERE post_id IN (1, 2, 3...)
@@ -41,8 +46,19 @@ class PostController extends Controller
             },
         ])->loadCount('comments');
 
+        //Notificaions 
         $notifications = auth()->user()->unReadNotifications;
-        return Inertia::render('Post/View' , ['post' => new PostResource($post) , 'notifications' => $notifications]);
+
+        // Sorted Chat
+        $chats = ChatResource::collection(Chat::with('lastMessage')->where('A' , $authId )->orWhere('B' , $authId)->get());
+            $chats = $chats->toArray(request());
+            usort($chats, function($a, $b) {
+                return   strtotime($b['timeOflastMessage']) - strtotime($a['timeOflastMessage']);
+            });
+        
+        return Inertia::render('Post/View' , ['post' => new PostResource($post) , 
+        'notifications' => $notifications
+    ,   'chats' => $chats]);
     }
     
     /**

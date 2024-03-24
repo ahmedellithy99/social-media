@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Http\Resources\ChatResource;
 use App\Http\Resources\NotificationResource;
 use App\Http\Resources\PostResource;
 use App\Http\Resources\UserResource;
+use App\Models\Chat;
 use App\Models\Follower;
 use App\Models\Post;
 use App\Models\User;
@@ -66,8 +68,9 @@ class ProfileController extends Controller
 
     public function index(Request $request, User $user)
     {   
-
+        $authId = auth()->user()->id;
         $isFollowing = false;
+        // Authenticated Users Only 
         if(Auth::guest())
         {
             return redirect(route('login'));
@@ -77,10 +80,18 @@ class ProfileController extends Controller
             
             $isFollowing = Follower::where('user_id' , $user->id)->where('follower_id' , auth()->user()->id)->exists();
         }
+        //Notifications
         $notifications = auth()->user()->unReadNotifications;
 
-        $filter = request('search');
+        // Sorted Chat
+        $chats = ChatResource::collection(Chat::with('lastMessage')->where('A' , $authId )->orWhere('B' , $authId)->get());
+            $chats = $chats->toArray(request());
+            usort($chats, function($a, $b) {
+                return   strtotime($b['timeOflastMessage']) - strtotime($a['timeOflastMessage']);
+            });
         
+        // Posts and filtering the posts 
+        $filter = request('search');
         $posts = Post::items(auth()->user()->id)
                         ->when(request('search') , function($query , $search){
                             $query->where('body' , 'like' , "%$search%");
@@ -88,16 +99,14 @@ class ProfileController extends Controller
                         ->where('user_id' , $user->id)
                         ->latest()->paginate(10);
         
+        // Paginations Magic 
         if ($request->wantsJson()) {
             return PostResource::collection($posts);
         }
 
+        // Followers and Followings
         $followers = $user->followers;
-        
-
         $followings = $user->followings;
-
-        // return $followers;
         $followersCount = count($user->followers);
         $followingsCount = count($user->followings);
 
@@ -112,7 +121,8 @@ class ProfileController extends Controller
         'isFollowing' => $isFollowing,
         'posts' => PostResource::collection($posts),
         'filter' => $filter,
-        'notifications' => NotificationResource::collection($notifications)
+        'notifications' => NotificationResource::collection($notifications),
+        'chats' =>$chats 
         
         ]);
     }

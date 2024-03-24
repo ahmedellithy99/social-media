@@ -1,5 +1,5 @@
 <script setup>
-import { Head, Link } from "@inertiajs/vue3";
+import { Head, Link, usePage } from "@inertiajs/vue3";
 import GroupList from "@/Components/app/GroupList.vue";
 import FollowingList from "@/Components/app/FollowingList.vue";
 import CreatePost from "@/Components/app/CreatePost.vue";
@@ -10,11 +10,12 @@ const props = defineProps({
     posts: Object,
     notifications: Array,
     followings: Array,
+    chats: Array,
 });
 </script>
 <template>
     <Head title="Social Media Website" />
-    <AuthenticatedLayout :notifications="notifications">
+    <AuthenticatedLayout :notifications="notifications" :chats="chats">
         <div class="grid lg:grid-cols-12 gap-3 p-4 h-full">
             <div class="lg:col-span-3 lg:order-1 h-full overflow-hidden">
                 <GroupList />

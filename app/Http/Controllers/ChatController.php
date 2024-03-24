@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Events\SendMessage;
+use App\Http\Resources\ChatResource;
 use App\Http\Resources\UserResource;
 use App\Models\Chat;
 use App\Models\Message;
@@ -13,8 +14,9 @@ class ChatController extends Controller
 {
     public function index(Request $request , Chat $chat)
     {   
+        $authId = auth()->user()->id;
+        // retrieving the Current Chat 
         $chat = $chat->load(['messages' , 'UserA' , 'UserB']);
-        
         if(auth()->user()->id == $chat['A'])
         {
             $sender = $chat['UserA'];
@@ -29,15 +31,30 @@ class ChatController extends Controller
             return response('You are not authorized' , 403);
         }
 
+        //Notifications for The Authenticated Layout
+        $notifications = auth()->user()->unReadNotifications;
+
+         // Sorted Chats for The Authenticated Layout
+        $chats = ChatResource::collection(Chat::with('lastMessage')->where('A' , $authId )->orWhere('B' , $authId)->get());
+        $chats = $chats->toArray(request());
+        usort($chats, function($a, $b) {
+            return   strtotime($b['timeOflastMessage']) - strtotime($a['timeOflastMessage']);
+        });
+
+
+
         return Inertia::render('Chat/Chat', ['chat' => $chat , 
-        'recipient' => new UserResource($recipient), 'sender' => new UserResource($sender)] );
+        'recipient' => new UserResource($recipient), 
+        'sender' => new UserResource($sender),
+        'notifications' => $notifications,
+        'chats' => $chats] );
     }
     
     public function store(Request $request)
     {
         $data =$request->validate([
             'body' => 'required' ,
-            'chat_id' => 'exists:chats,id'
+            'chat_id' => 'exists:chats,id',
         ]);
         // return $data['chat_id'];
         $message =Message::create([
@@ -45,6 +62,7 @@ class ChatController extends Controller
             'body' => $data['body'],
             'chat_id' => $data['chat_id']
         ]);
+        
         // BroadcastHere 
         broadcast(new SendMessage($data['chat_id'] , $message));
 
