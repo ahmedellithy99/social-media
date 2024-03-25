@@ -1,8 +1,7 @@
 <script setup>
-import {ref } from "vue";
-import {useForm, usePage} from "@inertiajs/vue3";
+import { ref } from "vue";
+import { useForm, usePage } from "@inertiajs/vue3";
 import PostModal from "@/Components/app/PostModal.vue";
-
 
 const authUser = usePage().props.auth.user;
 
@@ -10,23 +9,21 @@ const showModal = ref(false);
 
 const createPost = ref({
     id: null,
-    body: '',
-    user: authUser
+    body: "",
+    user: authUser,
 });
 
-function ShowCreatePostModal()
-{
+function ShowCreatePostModal() {
     showModal.value = true;
 }
-
-
-
-
 </script>
 
 <template>
     <div class="p-4 bg-white rounded-lg border mb-3">
-        <div @click="ShowCreatePostModal" class="py-3 px-2  border-2 border-gray-200 rounded mb-3">
+        <div
+            @click="ShowCreatePostModal"
+            class="py-3 px-2 border-2 border-gray-200 rounded mb-3"
+        >
             Create a Post Yalla
         </div>
         <!-- <div v-if="postCreating" class="flex gap-2 justify-between">
@@ -38,9 +35,8 @@ function ShowCreatePostModal()
                 Submit
             </button>
         </div> -->
-        <PostModal :post="createPost" v-model="showModal"/>
+        <PostModal :post="createPost" v-model="showModal" />
     </div>
 </template>
 
-<style scoped>
-</style>
+<style scoped></style>

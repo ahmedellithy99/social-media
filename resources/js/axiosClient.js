@@ -1,4 +1,4 @@
-import axios from 'axios'
+import axios from "axios";
 
 const instance = axios.create();
 // Add a request interceptor
@@ -7,4 +7,4 @@ instance.interceptors.request.use(function (config) {
     return config;
 });
 
-export default instance
+export default instance;

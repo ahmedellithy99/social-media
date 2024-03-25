@@ -2,9 +2,9 @@
 defineProps({
     type: {
         type: String,
-        default: 'button'
-    }
-})
+        default: "button",
+    },
+});
 </script>
 
 <template>
@@ -16,5 +16,4 @@ defineProps({
     </button>
 </template>
 
-<style scoped>
-</style>
+<style scoped></style>

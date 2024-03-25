@@ -1,33 +1,42 @@
 <script setup>
 defineProps({
     post: {
-        type: Object
+        type: Object,
     },
     showTime: {
         type: Boolean,
-        default: true
-    }
-})
+        default: true,
+    },
+});
 </script>
 
-<template>  
-    <div class="flex items-center gap-2 ">
-        <a :href="route('profile' , post.user.username )">
-            <img :src="post.user.avatar_url"
-                class="w-[40px] h-[40px] rounded-full border-2 transition-all hover:border-blue-500"/>
+<template>
+    <div class="flex items-center gap-2">
+        <a :href="route('profile', post.user.username)">
+            <img
+                :src="post.user.avatar_url"
+                class="w-[40px] h-[40px] rounded-full border-2 transition-all hover:border-blue-500"
+            />
         </a>
         <div>
             <h4 class="font-bold">
-                <a :href="route('profile' , post.user.username )" class="hover:underline">{{ post.user.name }}</a>
+                <a
+                    :href="route('profile', post.user.username)"
+                    class="hover:underline"
+                    >{{ post.user.name }}</a
+                >
                 <template v-if="post.group">
                     >
-                    <a href="javascript:void(0)" class="hover:underline">{{ post.group.name }}</a>
+                    <a href="javascript:void(0)" class="hover:underline">{{
+                        post.group.name
+                    }}</a>
                 </template>
             </h4>
-            <small v-if="showTime" class="text-gray-400">{{ post.updated_at }}</small>
+            <small v-if="showTime" class="text-gray-400">{{
+                post.updated_at
+            }}</small>
         </div>
     </div>
 </template>
 
-<style scoped>
-</style>
+<style scoped></style>

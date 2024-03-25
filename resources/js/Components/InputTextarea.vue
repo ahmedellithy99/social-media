@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref ,watch } from 'vue';
+import { onMounted, ref, watch } from "vue";
 
 const props = defineProps({
     modelValue: {
@@ -9,39 +9,39 @@ const props = defineProps({
     placeholder: String,
     autoResize: {
         type: Boolean,
-        default: true
-    }
-
+        default: true,
+    },
 });
 
-const emit = defineEmits(['update:modelValue']);
+const emit = defineEmits(["update:modelValue"]);
 
-function onInputChange($event)
-{
-    emit('update:modelValue', $event.target.value);
-    
+function onInputChange($event) {
+    emit("update:modelValue", $event.target.value);
+
     adjustHeight();
 }
 
 function adjustHeight() {
     if (props.autoResize) {
-        input.value.style.height = 'auto';
-        input.value.style.height = (input.value.scrollHeight + 2 )+ 'px';
+        input.value.style.height = "auto";
+        input.value.style.height = input.value.scrollHeight + 2 + "px";
     }
 }
 
 const input = ref(null);
 
 onMounted(() => {
-    adjustHeight()
+    adjustHeight();
 });
 
-watch(() => props.modelValue, () => {
-    
-    setTimeout(() => {
-        adjustHeight()
-    }, 10)
-})
+watch(
+    () => props.modelValue,
+    () => {
+        setTimeout(() => {
+            adjustHeight();
+        }, 10);
+    }
+);
 
 defineExpose({ focus: () => input.value.focus() });
 </script>
@@ -52,6 +52,5 @@ defineExpose({ focus: () => input.value.focus() });
         :value="modelValue"
         @input="onInputChange"
         ref="input"
-        
     />
 </template>
