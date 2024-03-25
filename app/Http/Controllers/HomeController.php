@@ -9,6 +9,7 @@ use App\Http\Resources\UserResource;
 use App\Models\Chat;
 use App\Models\Post;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class HomeController extends Controller
@@ -16,23 +17,28 @@ class HomeController extends Controller
     public function index(Request $request)
     {   
 
-        if(isset(auth()->user()->id)){
-            $userId = auth()->user()->id;
+        if(Auth::authenticate()){
+            $authUser = auth()->user();
+            $authId = $authUser->id;
 
             // Sorted  Chats 
-            $chats = ChatResource::collection(Chat::with('lastMessage')->where('A' , $userId )->orWhere('B' , $userId)->get());
+            $chats = ChatResource::collection(Chat::with('lastMessage')->where('A' , $authId )->orWhere('B' , $authId)->get());
             $chats = $chats->toArray(request());
             usort($chats, function($a, $b) {
                 return   strtotime($b['timeOflastMessage']) - strtotime($a['timeOflastMessage']);
             });
             // Notifications 
-            $notifications = auth()->user()->notifications;
+
+            $notifications = $authUser->notifications;
+            // Unread Notifications Count
+            $countUnReads = $authUser->unReadNotifications->count();
+
             // Posts 
-            $posts = Post::items($userId)
-                ->join('followers AS f' , function ($join) use ($userId) {
-                $join->on('posts.user_id' , '=' , 'f.user_id')->where('f.follower_id', '=', $userId);
+            $posts = Post::items($authId)
+                ->join('followers AS f' , function ($join) use ($authId) {
+                $join->on('posts.user_id' , '=' , 'f.user_id')->where('f.follower_id', '=', $authId);
             })
-            ->latest()->paginate(100);
+            ->latest()->paginate(10);
         
             $posts = PostResource::collection($posts);
         
@@ -45,8 +51,8 @@ class HomeController extends Controller
             }
 
                 return Inertia::render('Home' , ['posts' => $posts , 
-                'notifications' => NotificationResource::collection($notifications)
-                ,
+                'notifications' => NotificationResource::collection($notifications),
+                'countUnReads' => $countUnReads,
                 'followings' => $followings ,
                 'chats' => $chats] );
             }

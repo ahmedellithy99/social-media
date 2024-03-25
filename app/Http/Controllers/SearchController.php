@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\ChatResource;
+use App\Http\Resources\NotificationResource;
 use App\Http\Resources\UserResource;
 use App\Models\Chat;
 use App\Models\User;
@@ -13,7 +14,9 @@ class SearchController extends Controller
 {
     public function userSearch(Request $request)
     {   
-        $authId = auth()->user()->id ;
+        $authUser = auth()->user();
+        $authId = $authUser->id;
+        
         $users = User::query()
         ->when(request('search') , function($query , $search)
         {
@@ -25,7 +28,10 @@ class SearchController extends Controller
         ->paginate(5);
 
         //Notifications for The Authenticated Layout
-        $notifications = auth()->user()->unReadNotifications;
+        $notifications = $authUser->notifications;
+        
+        $countUnReads = $authUser->unReadNotifications->count();
+
 
          // Sorted Chats for The Authenticated Layout
         $chats = ChatResource::collection(Chat::with('lastMessage')->where('A' , $authId )->orWhere('B' , $authId)->get());
@@ -36,9 +42,9 @@ class SearchController extends Controller
 
         return Inertia::render('Search/Users' ,['users' => UserResource::collection($users) 
         , 'filter' => request('search')
-        ,'notifications' => $notifications,
-        'chats' => $chats
- ],
+        ,'notifications' => NotificationResource::collection($notifications),
+        'chats' => $chats,
+        'countUnReads' => $countUnReads,],
     );
     }
 

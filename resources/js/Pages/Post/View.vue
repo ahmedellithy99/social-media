@@ -8,7 +8,10 @@ import {usePage} from "@inertiajs/vue3";
 
 defineProps({
     post: Object,
-    notifications : Array
+    notifications : Array,
+    chats : Array,
+    countUnReads: Number,
+
 })
 
 
@@ -42,7 +45,11 @@ function onModalHide() {
 </script>
 
 <template>
-    <AuthenticatedLayout :notifications="notifications">
+    <AuthenticatedLayout
+        :notifications="notifications"
+        :chats="chats"
+        :countUnReads="countUnReads"
+    >
         <div class="p-8 lg:w-[700px] mx-auto h-full overflow-auto">
             <PostItem :post="post"
                     @editClick="openEditModal"

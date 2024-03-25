@@ -36,7 +36,8 @@ class PostController extends Controller
      */
     public function show(Post $post)
     {
-        $authId = auth()->user()->id;
+        $authUser = auth()->user();
+        $authId = $authUser->id;
 
         // Loading certain post 
         $post->loadCount('reactions')->load([
@@ -47,7 +48,8 @@ class PostController extends Controller
         ])->loadCount('comments');
 
         //Notificaions 
-        $notifications = auth()->user()->unReadNotifications;
+        $notifications = $authUser->notifications;
+        $countUnReads = $authUser->unReadNotifications->count();
 
         // Sorted Chat
         $chats = ChatResource::collection(Chat::with('lastMessage')->where('A' , $authId )->orWhere('B' , $authId)->get());
@@ -57,8 +59,9 @@ class PostController extends Controller
             });
         
         return Inertia::render('Post/View' , ['post' => new PostResource($post) , 
-        'notifications' => $notifications
-    ,   'chats' => $chats]);
+        'notifications' => $notifications,
+        'chats' => $chats,
+        'countUnReads' => $countUnReads,]);
     }
     
     /**

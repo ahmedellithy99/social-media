@@ -11,11 +11,16 @@ const props = defineProps({
     notifications: Array,
     followings: Array,
     chats: Array,
+    countUnReads: Number,
 });
 </script>
 <template>
     <Head title="Social Media Website" />
-    <AuthenticatedLayout :notifications="notifications" :chats="chats">
+    <AuthenticatedLayout
+        :notifications="notifications"
+        :chats="chats"
+        :countUnReads="countUnReads"
+    >
         <div class="grid lg:grid-cols-12 gap-3 p-4 h-full">
             <div class="lg:col-span-3 lg:order-1 h-full overflow-hidden">
                 <GroupList />

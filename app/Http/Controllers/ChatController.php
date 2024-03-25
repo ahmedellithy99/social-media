@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Events\SendMessage;
 use App\Http\Resources\ChatResource;
+use App\Http\Resources\NotificationResource;
 use App\Http\Resources\UserResource;
 use App\Models\Chat;
 use App\Models\Message;
@@ -14,7 +15,8 @@ class ChatController extends Controller
 {
     public function index(Request $request , Chat $chat)
     {   
-        $authId = auth()->user()->id;
+        $authUser = auth()->user();
+        $authId = $authUser->id;
         // retrieving the Current Chat 
         $chat = $chat->load(['messages' , 'UserA' , 'UserB']);
         if(auth()->user()->id == $chat['A'])
@@ -32,7 +34,9 @@ class ChatController extends Controller
         }
 
         //Notifications for The Authenticated Layout
-        $notifications = auth()->user()->unReadNotifications;
+        $notifications = $authUser->notifications;
+        $countUnReads = $authUser->unReadNotifications->count();
+
 
          // Sorted Chats for The Authenticated Layout
         $chats = ChatResource::collection(Chat::with('lastMessage')->where('A' , $authId )->orWhere('B' , $authId)->get());
@@ -46,8 +50,10 @@ class ChatController extends Controller
         return Inertia::render('Chat/Chat', ['chat' => $chat , 
         'recipient' => new UserResource($recipient), 
         'sender' => new UserResource($sender),
-        'notifications' => $notifications,
-        'chats' => $chats] );
+        'notifications' => NotificationResource::collection($notifications),
+        'chats' => $chats,
+        'countUnReads' => $countUnReads,
+        ] );
     }
     
     public function store(Request $request)

@@ -9,6 +9,7 @@ const props = defineProps({
     recipient: Object,
     notifications: Array,
     chats: Array,
+    countUnReads: Number,
 });
 
 const authUser = usePage().props.auth.user.id;
@@ -47,7 +48,11 @@ Echo.join("chat." + chat_id).listen("SendMessage", (e) => {
 </script>
 
 <template>
-    <AuthenticatedLayout :notifications="notifications" :chats="chats">
+    <AuthenticatedLayout
+        :notifications="notifications"
+        :chats="chats"
+        :countUnReads="countUnReads"
+    >
         <section
             class="container mx-auto mt-24 p-4 bg-white rounded-lg shadow-lg"
         >

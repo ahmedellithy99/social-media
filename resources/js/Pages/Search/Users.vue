@@ -11,6 +11,8 @@ const props = defineProps({
     filter: String,
     notifications: Array,
     chats: Array,
+    countUnReads: Number,
+
 });
 
 const search = ref(props.filter);
@@ -26,7 +28,11 @@ watch(
 </script>
 
 <template>
-    <AuthenticatedLayout :notifications="notifications" :chats="chats">
+    <AuthenticatedLayout
+        :notifications="notifications"
+        :chats="chats"
+        :countUnReads="countUnReads"
+    >
         <div class="p-4 w-full sm:px-32">
             <TextInput
                 v-model="search"

@@ -60,5 +60,10 @@ class UserController extends Controller
 
     }
 
+    public function markAsReads(User $user)
+    {
+        $user->notifications->markAsRead();
+    }
+
 
 }

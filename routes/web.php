@@ -24,11 +24,17 @@ use Inertia\Inertia;
 
 Route::middleware('auth')->group(function () {
     
+    // Home
     Route::get('/' , [HomeController::class , 'index'])->name('home');
+    
     //Profile
+    
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::get('u/{user:username}' , [ProfileController::class , 'index'])->name('profile');
+    Route::post('/updateImage' , [ProfileController::class , 'updateImage'])->name('update.image');
+
 
 
 
@@ -46,6 +52,7 @@ Route::middleware('auth')->group(function () {
 
     Route::post('user/follow/{user}' , [UserController::class , 'follow'])->name('user.follow');
     Route::post('user/unfollow/{user}' , [UserController::class , 'unfollow'])->name('user.unfollow');
+    Route::post('user/markAsRead/{user}' , [UserController::class , 'markAsReads'])->name('user.markAsRead');
     
     // Search From Nav Bar
     Route::get('/users', [SearchController::class, 'userSearch'])
@@ -56,9 +63,6 @@ Route::middleware('auth')->group(function () {
     Route::post('/chat/sendMessage' ,[ChatController::class , 'store'] )->name('chat.store');
 
 });
-
-Route::get('u/{user:username}' , [ProfileController::class , 'index'])->name('profile');
-Route::post('/updateImage' , [ProfileController::class , 'updateImage'])->name('update.image');
 
 
 require __DIR__.'/auth.php';
