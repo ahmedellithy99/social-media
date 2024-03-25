@@ -14,19 +14,19 @@ class Comment extends Model
 
     protected $guarded = [];
 
-    
-    public function user():BelongsTo
+
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
-    public function post():BelongsTo
+    public function post(): BelongsTo
     {
         return $this->belongsTo(Post::class);
     }
 
-    public function reactions():MorphMany
+    public function reactions(): MorphMany
     {
-        return $this->morphMany(Reaction::class , 'reactable');
+        return $this->morphMany(Reaction::class, 'reactable');
     }
 }

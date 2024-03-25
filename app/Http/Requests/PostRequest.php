@@ -9,11 +9,13 @@ use Illuminate\Validation\Rules\File;
 class PostRequest extends FormRequest
 {
 
-    public static array $extensions = ['jpg', 'jpeg', 'png', 'gif', 'webp',
-    'mp3', 'wav', 'mp4',
-    "doc", "docx", "csv", "xls", "xlsx",
-    "zip" ];
-    
+    public static array $extensions = [
+        'jpg', 'jpeg', 'png', 'gif', 'webp',
+        'mp3', 'wav', 'mp4',
+        "doc", "docx", "csv", "xls", "xlsx",
+        "zip"
+    ];
+
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -36,14 +38,14 @@ class PostRequest extends FormRequest
                 'max:50',
                 function ($attribute, $value, $fail) {
                     // Custom rule to check the total size of all files
-                    $totalSize = collect($value)->sum(fn(UploadedFile $file) => $file->getSize());
+                    $totalSize = collect($value)->sum(fn (UploadedFile $file) => $file->getSize());
 
                     if ($totalSize > 1 * 1024 * 1024 * 1024) {
                         $fail('The total size of all files must not exceed 1GB.');
                     }
                 },
-            ] ,
-            'attachments.*' => ['file' , File::types(self::$extensions) , 'max: 50000'],
+            ],
+            'attachments.*' => ['file', File::types(self::$extensions), 'max: 50000'],
             'user_id' => 'numeric'
         ];
     }

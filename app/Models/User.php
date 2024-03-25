@@ -12,7 +12,7 @@ use Laravel\Sanctum\HasApiTokens;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 
-class User extends Authenticatable 
+class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
     use HasSlug;
@@ -59,20 +59,18 @@ class User extends Authenticatable
             ->doNotGenerateSlugsOnUpdate();
     }
 
-    public function posts():HasMany
+    public function posts(): HasMany
     {
         return $this->hasMany(Post::class);
     }
 
-    public function followers():BelongsToMany
+    public function followers(): BelongsToMany
     {
-        return $this->belongsToMany(User::class , 'followers' , 'user_id' , 'follower_id');
+        return $this->belongsToMany(User::class, 'followers', 'user_id', 'follower_id');
     }
 
-    public function followings():BelongsToMany
+    public function followings(): BelongsToMany
     {
-        return $this->belongsToMany(User::class , 'followers' , 'follower_id' , 'user_id' );
+        return $this->belongsToMany(User::class, 'followers', 'follower_id', 'user_id');
     }
-
-    
 }

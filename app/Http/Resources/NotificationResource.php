@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Storage;
 
 class NotificationResource extends JsonResource
 {
-    
+
     /**
      * Transform the resource into an array.
      *
@@ -21,11 +21,11 @@ class NotificationResource extends JsonResource
     public function toArray(Request $request): array
     {
         // dd($this);
-        return[
-            'avatar_url' => Storage::url(User::where('id' , $this->data['user_id'])->get('avatar_path')[0]['avatar_path']),
-            'text' => $this->data['text']  ,
+        return [
+            'avatar_url' => Storage::url(User::where('id', $this->data['user_id'])->get('avatar_path')[0]['avatar_path']),
+            'text' => $this->data['text'],
             'post_id' => $this->data['post_id'] ?? '',
-            'username' => $this->data['username']?? '',
+            'username' => $this->data['username'] ?? '',
         ];
     }
 }

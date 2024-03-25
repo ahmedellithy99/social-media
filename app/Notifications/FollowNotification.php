@@ -10,17 +10,17 @@ use Illuminate\Support\Facades\Storage;
 
 class FollowNotification extends Notification implements ShouldQueue
 {
-    use Queueable ;
-    
-    public $reactedUser ;
+    use Queueable;
+
+    public $reactedUser;
     public $userId;
     public $username;
     /**
      * Create a new notification instance.
      */
-    public function __construct($reactedUser ,  $username , $userId )
-    {   
-        $this->reactedUser = $reactedUser ;
+    public function __construct($reactedUser,  $username, $userId)
+    {
+        $this->reactedUser = $reactedUser;
         $this->userId = $userId;
         $this->username = $username;
     }
@@ -41,9 +41,9 @@ class FollowNotification extends Notification implements ShouldQueue
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-                    ->line('The introduction to the notification.')
-                    ->action('Notification Action', url('/'))
-                    ->line('Thank you for using our application!');
+            ->line('The introduction to the notification.')
+            ->action('Notification Action', url('/'))
+            ->line('Thank you for using our application!');
     }
 
     /**
@@ -54,7 +54,7 @@ class FollowNotification extends Notification implements ShouldQueue
     public function toArray(object $notifiable): array
     {
         return [
-            'text' => $this->reactedUser . " is following You" ,
+            'text' => $this->reactedUser . " is following You",
             'user_id' => $this->userId,
             'username' => $this->username,
         ];

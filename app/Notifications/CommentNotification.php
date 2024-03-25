@@ -12,19 +12,19 @@ class CommentNotification extends Notification
 {
     use Queueable;
 
-    public $commentedUser ;
+    public $commentedUser;
     public $postBody;
     public $postId;
     public $userId;
     /**
      * Create a new notification instance.
      */
-    public function __construct($commentedUser , $postBody , $postId , $userId)
+    public function __construct($commentedUser, $postBody, $postId, $userId)
     {
-        $this->commentedUser = $commentedUser ;
-        $this->postBody = $postBody ;
+        $this->commentedUser = $commentedUser;
+        $this->postBody = $postBody;
         $this->postId = $postId;
-        $this->userId =$userId;
+        $this->userId = $userId;
     }
 
     /**
@@ -43,9 +43,9 @@ class CommentNotification extends Notification
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-                    ->line('The introduction to the notification.')
-                    ->action('Notification Action', url('/'))
-                    ->line('Thank you for using our application!');
+            ->line('The introduction to the notification.')
+            ->action('Notification Action', url('/'))
+            ->line('Thank you for using our application!');
     }
 
     /**
@@ -56,8 +56,8 @@ class CommentNotification extends Notification
     public function toArray(object $notifiable): array
     {
         return [
-            'text' => $this->commentedUser . " Comment Your Post: " .substr($this->postBody , 0 , 10) ?? '',
-            'post_id' => $this->postId ,
+            'text' => $this->commentedUser . " Comment Your Post: " . substr($this->postBody, 0, 10) ?? '',
+            'post_id' => $this->postId,
             'user_id' => $this->userId,
         ];
     }

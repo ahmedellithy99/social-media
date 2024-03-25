@@ -12,22 +12,21 @@ class ReactionNotification extends Notification
 {
     use Queueable;
 
-    public $reactedUser ;
+    public $reactedUser;
     public $reactedId;
     public $postId;
     public $postBody;
 
-    
+
     /**
      * Create a new notification instance.
      */
-    public function __construct($reactedUser , $reactedId , $postId , $postBody )
+    public function __construct($reactedUser, $reactedId, $postId, $postBody)
     {
-        $this->reactedUser = $reactedUser ;
+        $this->reactedUser = $reactedUser;
         $this->postId = $postId;
         $this->reactedId = $reactedId;
         $this->postBody = $postBody;
-        
     }
 
     /**
@@ -46,9 +45,9 @@ class ReactionNotification extends Notification
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-                    ->line('The introduction to the notification.')
-                    ->action('Notification Action', url('/'))
-                    ->line('Thank you for using our application!');
+            ->line('The introduction to the notification.')
+            ->action('Notification Action', url('/'))
+            ->line('Thank you for using our application!');
     }
 
     /**
@@ -59,10 +58,9 @@ class ReactionNotification extends Notification
     public function toArray(object $notifiable): array
     {
         return [
-            'text' => $this->reactedUser . " Liked Your Post: " .substr($this->postBody , 0 , 10) ?? '',
-            'post_id' => $this->postId ,
+            'text' => $this->reactedUser . " Liked Your Post: " . substr($this->postBody, 0, 10) ?? '',
+            'post_id' => $this->postId,
             'user_id' => $this->reactedId,
-
         ];
     }
 }

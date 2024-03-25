@@ -15,16 +15,16 @@ use Inertia\Inertia;
 class HomeController extends Controller
 {
     public function index(Request $request)
-    {   
+    {
 
-        if(Auth::authenticate()){
+        if (Auth::authenticate()) {
             $authUser = auth()->user();
             $authId = $authUser->id;
 
             // Sorted  Chats 
-            $chats = ChatResource::collection(Chat::with('lastMessage')->where('A' , $authId )->orWhere('B' , $authId)->get());
+            $chats = ChatResource::collection(Chat::with('lastMessage')->where('A', $authId)->orWhere('B', $authId)->get());
             $chats = $chats->toArray(request());
-            usort($chats, function($a, $b) {
+            usort($chats, function ($a, $b) {
                 return   strtotime($b['timeOflastMessage']) - strtotime($a['timeOflastMessage']);
             });
             // Notifications 
@@ -35,30 +35,30 @@ class HomeController extends Controller
 
             // Posts 
             $posts = Post::items($authId)
-                ->join('followers AS f' , function ($join) use ($authId) {
-                $join->on('posts.user_id' , '=' , 'f.user_id')->where('f.follower_id', '=', $authId);
-            })
-            ->latest()->paginate(10);
-        
+                ->join('followers AS f', function ($join) use ($authId) {
+                    $join->on('posts.user_id', '=', 'f.user_id')->where('f.follower_id', '=', $authId);
+                })
+                ->latest()->paginate(10);
+
             $posts = PostResource::collection($posts);
-        
+
             //Followings 
-            $followings=  UserResource::collection(auth()->user()->followings);
+            $followings =  UserResource::collection(auth()->user()->followings);
 
             // Paginating Request 
             if ($request->wantsJson()) {
-                    return $posts;
+                return $posts;
             }
 
-                return Inertia::render('Home' , ['posts' => $posts , 
+            return Inertia::render('Home', [
+                'posts' => $posts,
                 'notifications' => NotificationResource::collection($notifications),
                 'countUnReads' => $countUnReads,
-                'followings' => $followings ,
-                'chats' => $chats] );
-            }
+                'followings' => $followings,
+                'chats' => $chats
+            ]);
+        }
 
-            return redirect(route('login'));
+        return redirect(route('login'));
     }
-
-    
 }

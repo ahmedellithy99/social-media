@@ -52,73 +52,68 @@ class PostController extends Controller
         $countUnReads = $authUser->unReadNotifications->count();
 
         // Sorted Chat
-        $chats = ChatResource::collection(Chat::with('lastMessage')->where('A' , $authId )->orWhere('B' , $authId)->get());
-            $chats = $chats->toArray(request());
-            usort($chats, function($a, $b) {
-                return   strtotime($b['timeOflastMessage']) - strtotime($a['timeOflastMessage']);
-            });
-        
-        return Inertia::render('Post/View' , ['post' => new PostResource($post) , 
-        'notifications' => $notifications,
-        'chats' => $chats,
-        'countUnReads' => $countUnReads,]);
+        $chats = ChatResource::collection(Chat::with('lastMessage')->where('A', $authId)->orWhere('B', $authId)->get());
+        $chats = $chats->toArray(request());
+        usort($chats, function ($a, $b) {
+            return   strtotime($b['timeOflastMessage']) - strtotime($a['timeOflastMessage']);
+        });
+
+        return Inertia::render('Post/View', [
+            'post' => new PostResource($post),
+            'notifications' => $notifications,
+            'chats' => $chats,
+            'countUnReads' => $countUnReads,
+        ]);
     }
-    
+
     /**
      * Store a newly created resource in storage.
      */
     public function store(PostRequest $request)
     {
-        
+
         $data = $request->validated();
 
-        DB::beginTransaction(); 
-        
+        DB::beginTransaction();
+
         $allFilePaths = [];
-        try
-        {
-            $post = Post::create(Arr::except($data , ['attachments']));
-            
+        try {
+            $post = Post::create(Arr::except($data, ['attachments']));
+
             $allFilePaths = [];
-            
-            
+
+
             /** @var \Illuminate\Http\UploadedFile[] $files */
-            $files = $data['attachments'] ?? [] ;
-    
-            
-            foreach($files as $file)
-            {
+            $files = $data['attachments'] ?? [];
+
+
+            foreach ($files as $file) {
                 $path = $file->store('attachments/' . $post->id, 'public');
-                $allFilePaths[]= $path;
-                
+                $allFilePaths[] = $path;
+
                 PostAttachment::create(
                     [
-                        'post_id' => $post->id ,
+                        'post_id' => $post->id,
                         'name' => $file->getClientOriginalName(),
-                        'path'=> $path,
+                        'path' => $path,
                         'mime' => $file->getMimeType(),
                         'size' => $file->getSize(),
-                        'user_id'=> auth()->user()->id
+                        'user_id' => auth()->user()->id
                     ]
                 );
-
             }
-            
-            DB::commit();
-        }
 
-        catch(\Exception $e)
-        {
+            DB::commit();
+        } catch (\Exception $e) {
             foreach ($allFilePaths as $path) {
                 Storage::disk('public')->delete($path);
             }
-            
+
             DB::rollBack();
             throw $e;
         }
 
-        return redirect(route('post.show', $post) );
-        
+        return redirect(route('post.show', $post));
     }
 
     /**
@@ -132,7 +127,7 @@ class PostController extends Controller
         $allFilePaths = [];
         try {
             $data = $request->validated();
-            $post->update(Arr::except($data , ['attachments' , 'deleted_file_ids']));
+            $post->update(Arr::except($data, ['attachments', 'deleted_file_ids']));
 
             $deleted_ids = $data['deleted_file_ids'] ?? []; // 1, 2, 3, 4
 
@@ -177,55 +172,50 @@ class PostController extends Controller
      */
     public function destroy(Post $post)
     {
-        if(auth()->user()->id != $post->user->id)
-        {
+        if (auth()->user()->id != $post->user->id) {
             return response("You don't have permission to delete this post", 403);
         }
         try {
             DB::beginTransaction();
-        
+
             // Perform your database operations here
             $post->comments()->delete();
             $post->reactions()->delete();
             $post->delete();
-        
+
             // If all operations are successful, commit the transaction
             DB::commit();
-        
         } catch (\Exception $e) {
             // If any operation fails, rollback the transaction
             DB::rollback();
-        
+
             // Handle the exception (log it, display a message, etc.)
             throw $e;
         }
-        
+
         return back();
     }
 
     // Reacting on a Post 
-    public function postReaction(Request $request ,Post $post)
-    {   
-        
-        $data =$request->validate([
+    public function postReaction(Request $request, Post $post)
+    {
+
+        $data = $request->validate([
             'reaction' => [Rule::enum(PostReactionEnum::class)]
         ]);
         $user = auth()->user();
 
         // return response(['user_id' => $user->id , 'post_owner' => $post->user->id ] );
 
-        
-        $reaction = Reaction::where('reactable_id' , $post->id)
-                            ->where('reactable_type' , Post::class)
-                            ->where('user_id' , $user->id )->first();
-        
-        if($reaction)
-        {
+
+        $reaction = Reaction::where('reactable_id', $post->id)
+            ->where('reactable_type', Post::class)
+            ->where('user_id', $user->id)->first();
+
+        if ($reaction) {
             $hasReaction = false;
             $reaction->delete();
-        }
-        else
-        {   
+        } else {
 
             $hasReaction = true;
             Reaction::create(
@@ -236,24 +226,21 @@ class PostController extends Controller
                     'reactable_type' => Post::class,
                 ]
             );
-            if($user->id != $post->user->id)
-            {
-                Notification::send($post->user , new ReactionNotification($user->name , $user->id , $post->id , $post->body ));
-
+            if ($user->id != $post->user->id) {
+                Notification::send($post->user, new ReactionNotification($user->name, $user->id, $post->id, $post->body));
             }
         }
 
-        $reactions = Reaction::where('reactable_id' , $post->id)
-                                ->where('reactable_type' ,Post::class )->count();
+        $reactions = Reaction::where('reactable_id', $post->id)
+            ->where('reactable_type', Post::class)->count();
 
         return response([
             'num_of_reactions' => $reactions,
             'current_user_has_reaction' => $hasReaction
         ]);
-
     }
 
-    public function postComment(Post $post , Request $request)
+    public function postComment(Post $post, Request $request)
     {
         $data = $request->validate(['comment' => 'required']);
         $author = $post->user;
@@ -264,41 +251,37 @@ class PostController extends Controller
             'user_id' => auth()->user()->id,
             'post_id' => $post->id
         ]);
-        if($author->id != $user->id)
-        {   
+        if ($author->id != $user->id) {
 
-            Notification::send($author , new CommentNotification($user->name , $post->body, $post->id ,$user->id));
+            Notification::send($author, new CommentNotification($user->name, $post->body, $post->id, $user->id));
         }
-        return response(new CommentResource($comment) , 201);
+        return response(new CommentResource($comment), 201);
     }
 
     public function deleteComment(Comment $comment)
     {
         $comment->reactions()->delete();
         $comment->delete();
-        
+
 
         return response(200);
     }
 
-    public function commentReaction(Comment $comment , Request $request)
+    public function commentReaction(Comment $comment, Request $request)
     {
-        $data =$request->validate([
+        $data = $request->validate([
             'reaction' => [Rule::enum(PostReactionEnum::class)]
         ]);
         $userId = auth()->user()->id;
-        
-        $reaction = Reaction::where('reactable_id' , $comment->id)
-                            ->where('reactable_type' , Comment::class)
-                            ->where('user_id' , $userId )->first();
-        
-        if($reaction)
-        {
+
+        $reaction = Reaction::where('reactable_id', $comment->id)
+            ->where('reactable_type', Comment::class)
+            ->where('user_id', $userId)->first();
+
+        if ($reaction) {
             $hasReaction = false;
             $reaction->delete();
-        }
-        else
-        {   
+        } else {
             $hasReaction = true;
             Reaction::create(
                 [
@@ -310,10 +293,10 @@ class PostController extends Controller
             );
         }
 
-        $reactions = Reaction::where('reactable_id' , $comment->id)
-                                ->where('reactable_type' ,Comment::class )->count();
+        $reactions = Reaction::where('reactable_id', $comment->id)
+            ->where('reactable_type', Comment::class)->count();
 
-                            
+
         return response([
             'num_of_reactions' => $reactions,
             'current_user_has_reaction' => $hasReaction

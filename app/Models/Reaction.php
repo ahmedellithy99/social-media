@@ -10,10 +10,10 @@ class Reaction extends Model
 {
     use HasFactory;
 
-    const UPDATED_AT = null ;
+    const UPDATED_AT = null;
     protected $guarded = [];
 
-    public function reactable():MorphTo
+    public function reactable(): MorphTo
     {
         return $this->morphTo();
     }

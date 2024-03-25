@@ -12,28 +12,28 @@ class Chat extends Model
 {
     use HasFactory;
 
-    const UPDATED_AT = NULL ;
-    const CREATED_AT = NULL ;
+    const UPDATED_AT = NULL;
+    const CREATED_AT = NULL;
 
     protected $guarded = [];
 
-    public function messages():HasMany
+    public function messages(): HasMany
     {
         return $this->hasMany(Message::class);
     }
 
     public function lastMessage()
-    {   
+    {
         return $this->hasOne(Message::class)->latestOfMany();
     }
 
-    public function userA():BelongsTo
+    public function userA(): BelongsTo
     {
-        return $this->belongsTo(User::class , 'A' );
+        return $this->belongsTo(User::class, 'A');
     }
 
-    public function userB():BelongsTo
+    public function userB(): BelongsTo
     {
-        return $this->belongsTo(User::class , 'B' );
+        return $this->belongsTo(User::class, 'B');
     }
 }

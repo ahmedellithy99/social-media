@@ -17,44 +17,47 @@ class Post extends Model
 
     protected $guarded = [];
 
-    public function user():BelongsTo
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
-    public function group():BelongsTo
+    public function group(): BelongsTo
     {
         return $this->belongsTo(Group::class);
     }
 
-    public function attachments():HasMany
+    public function attachments(): HasMany
     {
         return $this->hasMany(PostAttachment::class)->latest();
     }
-    
-    public function reactions():MorphMany
+
+    public function reactions(): MorphMany
     {
-        return $this->morphMany(Reaction::class , 'reactable');
+        return $this->morphMany(Reaction::class, 'reactable');
     }
 
-    public function comments():HasMany
+    public function comments(): HasMany
     {
         return $this->hasMany(Comment::class)->latest();
     }
 
-    public function scopeItems(Builder $query , $userId):void
+    public function scopeItems(Builder $query, $userId): void
     {
         $query->with('attachments')->withCount('reactions')
-        ->withCount('comments')
-        ->with(['user','comments' => function($query) use ($userId) {
-            $query->withCount('reactions')->with(
-                ['user','reactions' => function ($query) use ($userId) {
+            ->withCount('comments')
+            ->with([
+                'user', 'comments' => function ($query) use ($userId) {
+                    $query->withCount('reactions')->with(
+                        [
+                            'user', 'reactions' => function ($query) use ($userId) {
+                                $query->where('user_id', $userId);
+                            }
+                        ]
+                    );
+                }, 'reactions' => function ($query) use ($userId) {
                     $query->where('user_id', $userId);
                 }
-        ]);
-        }
-        ,'reactions' => function ($query) use ($userId) {
-            $query->where('user_id', $userId);
-        }]);
+            ]);
     }
 }

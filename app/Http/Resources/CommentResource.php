@@ -27,7 +27,7 @@ class CommentResource extends JsonResource
                 "username" => $this->user->username,
                 "avatar_url" => Storage::url($this->user->avatar_path)
             ],
-            'num_of_reactions' => $this->reactions_count  ,
+            'num_of_reactions' => $this->reactions_count,
             'current_user_has_reaction' => $this->reactions->count() > 0
         ];
     }

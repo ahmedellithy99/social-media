@@ -13,24 +13,20 @@ use Inertia\Inertia;
 
 class ChatController extends Controller
 {
-    public function index(Request $request , Chat $chat)
-    {   
+    public function index(Request $request, Chat $chat)
+    {
         $authUser = auth()->user();
         $authId = $authUser->id;
         // retrieving the Current Chat 
-        $chat = $chat->load(['messages' , 'UserA' , 'UserB']);
-        if(auth()->user()->id == $chat['A'])
-        {
+        $chat = $chat->load(['messages', 'UserA', 'UserB']);
+        if (auth()->user()->id == $chat['A']) {
             $sender = $chat['UserA'];
             $recipient = $chat['UserB'];
-        }
-        elseif(auth()->user()->id == $chat['B']){
+        } elseif (auth()->user()->id == $chat['B']) {
             $sender = $chat['UserB'];
             $recipient = $chat['UserA'];
-        }
-        else
-        {
-            return response('You are not authorized' , 403);
+        } else {
+            return response('You are not authorized', 403);
         }
 
         //Notifications for The Authenticated Layout
@@ -38,40 +34,41 @@ class ChatController extends Controller
         $countUnReads = $authUser->unReadNotifications->count();
 
 
-         // Sorted Chats for The Authenticated Layout
-        $chats = ChatResource::collection(Chat::with('lastMessage')->where('A' , $authId )->orWhere('B' , $authId)->get());
+        // Sorted Chats for The Authenticated Layout
+        $chats = ChatResource::collection(Chat::with('lastMessage')->where('A', $authId)->orWhere('B', $authId)->get());
         $chats = $chats->toArray(request());
-        usort($chats, function($a, $b) {
+        usort($chats, function ($a, $b) {
             return   strtotime($b['timeOflastMessage']) - strtotime($a['timeOflastMessage']);
         });
 
 
 
-        return Inertia::render('Chat/Chat', ['chat' => $chat , 
-        'recipient' => new UserResource($recipient), 
-        'sender' => new UserResource($sender),
-        'notifications' => NotificationResource::collection($notifications),
-        'chats' => $chats,
-        'countUnReads' => $countUnReads,
-        ] );
+        return Inertia::render('Chat/Chat', [
+            'chat' => $chat,
+            'recipient' => new UserResource($recipient),
+            'sender' => new UserResource($sender),
+            'notifications' => NotificationResource::collection($notifications),
+            'chats' => $chats,
+            'countUnReads' => $countUnReads,
+        ]);
     }
-    
+
     public function store(Request $request)
     {
-        $data =$request->validate([
-            'body' => 'required' ,
+        $data = $request->validate([
+            'body' => 'required',
             'chat_id' => 'exists:chats,id',
         ]);
         // return $data['chat_id'];
-        $message =Message::create([
+        $message = Message::create([
             'sender_id' => auth()->user()->id,
             'body' => $data['body'],
             'chat_id' => $data['chat_id']
         ]);
-        
-        // BroadcastHere 
-        broadcast(new SendMessage($data['chat_id'] , $message));
 
-        return back();   
+        // BroadcastHere 
+        broadcast(new SendMessage($data['chat_id'], $message));
+
+        return back();
     }
 }

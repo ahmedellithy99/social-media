@@ -10,8 +10,6 @@ class Follower extends Model
     use HasFactory;
 
     const UPDATED_AT = null;
-    
-    protected $guarded = []; 
 
-    
+    protected $guarded = [];
 }

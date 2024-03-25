@@ -23,46 +23,45 @@ use Inertia\Inertia;
 
 
 Route::middleware('auth')->group(function () {
-    
+
     // Home
-    Route::get('/' , [HomeController::class , 'index'])->name('home');
-    
+    Route::get('/', [HomeController::class, 'index'])->name('home');
+
     //Profile
-    
+
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-    Route::get('u/{user:username}' , [ProfileController::class , 'index'])->name('profile');
-    Route::post('/updateImage' , [ProfileController::class , 'updateImage'])->name('update.image');
+    Route::get('u/{user:username}', [ProfileController::class, 'index'])->name('profile');
+    Route::post('/updateImage', [ProfileController::class, 'updateImage'])->name('update.image');
 
 
 
 
     // Post 
-    Route::get('/post/{post}' , [PostController::class , 'show'] )->name('post.show');
-    Route::post('/post' , [PostController::class , 'store'] )->name('post.store');
-    Route::put('/post/{post}' , [PostController::class , 'update'])->name('post.update');
-    Route::delete('/post/{post}' , [PostController::class , 'destroy'])->name('post.delete');
-    Route::post('/post/{post}/reaction' , [PostController::class , 'postReaction'])->name('post.reaction');
-    Route::post('/post/{post}/comment' , [PostController::class , 'postComment'])->name('post.comment');
-    Route::delete('/post/{comment}/comment' , [PostController::class , 'deleteComment'])->name('delete.comment');
-    Route::post('/post/{comment}/reactions' , [PostController::class , 'commentReaction'])->name('comment.reaction');
+    Route::get('/post/{post}', [PostController::class, 'show'])->name('post.show');
+    Route::post('/post', [PostController::class, 'store'])->name('post.store');
+    Route::put('/post/{post}', [PostController::class, 'update'])->name('post.update');
+    Route::delete('/post/{post}', [PostController::class, 'destroy'])->name('post.delete');
+    Route::post('/post/{post}/reaction', [PostController::class, 'postReaction'])->name('post.reaction');
+    Route::post('/post/{post}/comment', [PostController::class, 'postComment'])->name('post.comment');
+    Route::delete('/post/{comment}/comment', [PostController::class, 'deleteComment'])->name('delete.comment');
+    Route::post('/post/{comment}/reactions', [PostController::class, 'commentReaction'])->name('comment.reaction');
 
     // User
 
-    Route::post('user/follow/{user}' , [UserController::class , 'follow'])->name('user.follow');
-    Route::post('user/unfollow/{user}' , [UserController::class , 'unfollow'])->name('user.unfollow');
-    Route::post('user/markAsRead/{user}' , [UserController::class , 'markAsReads'])->name('user.markAsRead');
-    
+    Route::post('user/follow/{user}', [UserController::class, 'follow'])->name('user.follow');
+    Route::post('user/unfollow/{user}', [UserController::class, 'unfollow'])->name('user.unfollow');
+    Route::post('user/markAsRead/{user}', [UserController::class, 'markAsReads'])->name('user.markAsRead');
+
     // Search From Nav Bar
     Route::get('/users', [SearchController::class, 'userSearch'])
         ->name('search.users');
 
     // Chat 
-    Route::get('/chat/{chat:subId}' ,[ChatController::class , 'index'] )->name('chat.index');
-    Route::post('/chat/sendMessage' ,[ChatController::class , 'store'] )->name('chat.store');
-
+    Route::get('/chat/{chat:subId}', [ChatController::class, 'index'])->name('chat.index');
+    Route::post('/chat/sendMessage', [ChatController::class, 'store'])->name('chat.store');
 });
 
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';

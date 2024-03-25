@@ -14,7 +14,7 @@ class ChatResource extends JsonResource
      * @return array<string, mixed>
      */
     public function toArray(Request $request): array
-    {   
+    {
         // dd(strtotime(Carbon::parse($this->lastMessage->created_at)->diffForHumans()));
         return [
             'id' => $this->id,
