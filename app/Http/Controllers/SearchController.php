@@ -40,6 +40,20 @@ class SearchController extends Controller
         usort($chats, function ($a, $b) {
             return   strtotime($b['timeOflastMessage']) - strtotime($a['timeOflastMessage']);
         });
+        
+        //Counting UnRead Chats 
+        $countUnReadChats = 0 ; 
+        foreach($chats as $chata)
+        {
+            if($chata['lastMessage'] == null || $chata['lastMessage']['sender_id'] == $authId )
+            {
+                continue;
+            }
+            if($chata['lastMessage']['read'] == 0)
+            {
+                $countUnReadChats += 1 ;
+            }
+        }
 
         return Inertia::render(
             'Search/Users',
@@ -47,6 +61,7 @@ class SearchController extends Controller
                 'users' => UserResource::collection($users), 'filter' => request('search'), 'notifications' => NotificationResource::collection($notifications),
                 'chats' => $chats,
                 'countUnReads' => $countUnReads,
+                'countUnReadChats' => $countUnReadChats
             ],
         );
     }

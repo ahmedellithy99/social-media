@@ -10,6 +10,7 @@ use App\Models\Chat;
 use App\Models\Post;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
 class HomeController extends Controller
@@ -21,12 +22,29 @@ class HomeController extends Controller
             $authUser = auth()->user();
             $authId = $authUser->id;
 
-            // Sorted  Chats 
-            $chats = ChatResource::collection(Chat::with('lastMessage')->where('A', $authId)->orWhere('B', $authId)->get());
-            $chats = $chats->toArray(request());
-            usort($chats, function ($a, $b) {
-                return   strtotime($b['timeOflastMessage']) - strtotime($a['timeOflastMessage']);
-            });
+
+
+            // Sorted Chats for The Authenticated Layout
+        $chats = ChatResource::collection(Chat::with('lastMessage')->where('A', $authId)->orWhere('B', $authId)->get());
+        $chats = $chats->toArray(request());
+        usort($chats, function ($a, $b) {
+            return   strtotime($b['timeOflastMessage']) - strtotime($a['timeOflastMessage']);
+        });
+        
+        //Counting UnRead Chats 
+        $countUnReadChats = 0 ; 
+        foreach($chats as $chata)
+        {
+            if($chata['lastMessage'] == null || $chata['lastMessage']['sender_id'] == $authId )
+            {
+                continue;
+            }
+            if($chata['lastMessage']['read'] == 0)
+            {
+                $countUnReadChats += 1 ;
+            }
+        }
+
             // Notifications 
 
             $notifications = $authUser->notifications;
@@ -55,7 +73,8 @@ class HomeController extends Controller
                 'notifications' => NotificationResource::collection($notifications),
                 'countUnReads' => $countUnReads,
                 'followings' => $followings,
-                'chats' => $chats
+                'chats' => $chats,
+                'countUnReadChats' => $countUnReadChats
             ]);
         }
 

@@ -51,18 +51,33 @@ class PostController extends Controller
         $notifications = $authUser->notifications;
         $countUnReads = $authUser->unReadNotifications->count();
 
-        // Sorted Chat
+        // Sorted Chats for The Authenticated Layout
         $chats = ChatResource::collection(Chat::with('lastMessage')->where('A', $authId)->orWhere('B', $authId)->get());
         $chats = $chats->toArray(request());
         usort($chats, function ($a, $b) {
             return   strtotime($b['timeOflastMessage']) - strtotime($a['timeOflastMessage']);
         });
+        
+        //Counting UnRead Chats 
+        $countUnReadChats = 0 ; 
+        foreach($chats as $chata)
+        {
+            if($chata['lastMessage'] == null || $chata['lastMessage']['sender_id'] == $authId )
+            {
+                continue;
+            }
+            if($chata['lastMessage']['read'] == 0)
+            {
+                $countUnReadChats += 1 ;
+            }
+        }
 
         return Inertia::render('Post/View', [
             'post' => new PostResource($post),
             'notifications' => $notifications,
             'chats' => $chats,
             'countUnReads' => $countUnReads,
+            'countUnReadChats' => $countUnReadChats
         ]);
     }
 

@@ -102,7 +102,7 @@ function getPost() {
 
         <div class="flex items-center justify-between mb-3">
             <PostUserHeader :post="post" />
-            <Menu as="div" class="relative z-10 inline-block text-left">
+            <Menu as="div" v-if="authUser.id == post.user.id" class="relative z-10 inline-block text-left">
                 <div>
                     <MenuButton
                         class="w-8 h-8 rounded-full hover:bg-black/5 transition flex items-center justify-center"

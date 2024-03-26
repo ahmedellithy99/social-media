@@ -40,8 +40,21 @@ class ChatController extends Controller
         usort($chats, function ($a, $b) {
             return   strtotime($b['timeOflastMessage']) - strtotime($a['timeOflastMessage']);
         });
-
-
+        
+        //Counting UnRead Chats 
+        $countUnReadChats = 0 ; 
+        foreach($chats as $chata)
+        {
+            if($chata['lastMessage'] == null || $chata['lastMessage']['sender_id'] == $authId )
+            {
+                continue;
+            }
+            if($chata['lastMessage']['read'] == 0)
+            {
+                $countUnReadChats += 1 ;
+            }
+        }
+        
 
         return Inertia::render('Chat/Chat', [
             'chat' => $chat,
@@ -50,6 +63,7 @@ class ChatController extends Controller
             'notifications' => NotificationResource::collection($notifications),
             'chats' => $chats,
             'countUnReads' => $countUnReads,
+            'countUnReadChats' => $countUnReadChats
         ]);
     }
 
@@ -70,5 +84,10 @@ class ChatController extends Controller
         broadcast(new SendMessage($data['chat_id'], $message));
 
         return back();
+    }
+
+    public function markAsRead(Message $msg)
+    {
+        $msg->update(['read' => true]);
     }
 }

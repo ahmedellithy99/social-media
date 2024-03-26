@@ -12,7 +12,7 @@ const props = defineProps({
     notifications: Array,
     chats: Array,
     countUnReads: Number,
-
+    countUnReadChats: Number,
 });
 
 const search = ref(props.filter);
@@ -32,6 +32,7 @@ watch(
         :notifications="notifications"
         :chats="chats"
         :countUnReads="countUnReads"
+        :countUnReadChats="countUnReadChats"
     >
         <div class="p-4 w-full sm:px-32">
             <TextInput

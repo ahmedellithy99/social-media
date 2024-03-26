@@ -11,6 +11,7 @@ defineProps({
     notifications: Array,
     chats: Array,
     countUnReads: Number,
+    countUnReadChats: Number,
 });
 
 const authUser = usePage().props.auth.user;
@@ -46,6 +47,7 @@ function onModalHide() {
         :notifications="notifications"
         :chats="chats"
         :countUnReads="countUnReads"
+        :countUnReadChats="countUnReadChats"
     >
         <div class="p-8 lg:w-[700px] mx-auto h-full overflow-auto">
             <PostItem

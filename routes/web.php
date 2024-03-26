@@ -61,6 +61,8 @@ Route::middleware('auth')->group(function () {
     // Chat 
     Route::get('/chat/{chat:subId}', [ChatController::class, 'index'])->name('chat.index');
     Route::post('/chat/sendMessage', [ChatController::class, 'store'])->name('chat.store');
+    Route::post('/chat/markAsRead/{msg}', [ChatController::class, 'markAsRead'])->name('chat.markAsRead');
+
 });
 
 

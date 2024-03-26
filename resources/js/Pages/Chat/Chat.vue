@@ -1,6 +1,6 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
-import { useForm, usePage } from "@inertiajs/vue3";
+import { router, useForm, usePage } from "@inertiajs/vue3";
 import { ref, onMounted, onUpdated } from "vue";
 
 const props = defineProps({
@@ -10,14 +10,23 @@ const props = defineProps({
     notifications: Array,
     chats: Array,
     countUnReads: Number,
+    countUnReadChats: Number,
 });
 
+const lastMessage = props.chat["messages"][props.chat["messages"].length - 1];
 const authUser = usePage().props.auth.user.id;
 const chat_id = props.chat["id"];
 const form = useForm({
     body: "",
     chat_id: chat_id,
 });
+
+if (lastMessage) {
+    if (lastMessage["read"] == 0 && lastMessage["sender_id"] != authUser) {
+        props.countUnReadChats--;
+        router.post(route("chat.markAsRead", lastMessage["id"]));
+    }
+}
 
 const msg = ref("");
 
@@ -52,6 +61,7 @@ Echo.join("chat." + chat_id).listen("SendMessage", (e) => {
         :notifications="notifications"
         :chats="chats"
         :countUnReads="countUnReads"
+        :countUnReadChats="countUnReadChats"
     >
         <section
             class="container mx-auto mt-24 p-4 bg-white rounded-lg shadow-lg"
@@ -66,6 +76,7 @@ Echo.join("chat." + chat_id).listen("SendMessage", (e) => {
                 ref="chatContainer"
             >
                 <!-- Chat Messages -->
+
                 <div
                     v-for="message of chat['messages']"
                     :key="message.id"
@@ -83,7 +94,7 @@ Echo.join("chat." + chat_id).listen("SendMessage", (e) => {
                                 <span>{{ message.body }}</span>
                             </div>
                             <span class="text-xs text-gray-400 mt-1">{{
-                                message.date
+                                message.created_at
                             }}</span>
                         </div>
                         <img
@@ -105,7 +116,9 @@ Echo.join("chat." + chat_id).listen("SendMessage", (e) => {
                             >
                                 <span>{{ message.body }}</span>
                             </div>
-                            <span class="text-xs text-gray-400 mt-1">now</span>
+                            <span class="text-xs text-gray-400 mt-1">{{
+                                message.created_at
+                            }}</span>
                         </div>
                     </div>
                     <!-- Add more messages as needed -->

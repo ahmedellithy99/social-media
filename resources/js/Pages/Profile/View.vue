@@ -51,6 +51,8 @@ const props = defineProps({
     chats: Array,
 
     countUnReads: Number,
+
+    countUnReadChats: Number,
 });
 
 const imagesForm = useForm({
@@ -171,6 +173,7 @@ function chating() {
         :notifications="notifications"
         :chats="chats"
         :countUnReads="countUnReads"
+        :countUnReadChats="countUnReadChats"
     >
         <ImageModal v-model="showCoverPhoto" :photo="user.cover_url" />
         <div class="max-w-[768px] mx-auto h-full overflow-auto px-6">
