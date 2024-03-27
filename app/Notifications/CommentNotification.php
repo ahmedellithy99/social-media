@@ -56,7 +56,7 @@ class CommentNotification extends Notification
     public function toArray(object $notifiable): array
     {
         return [
-            'text' => $this->commentedUser . " Comment Your Post: " . substr($this->postBody, 0, 10) ?? '',
+            'text' => $this->commentedUser . " Comment Your Post: " . mb_substr($this->postBody, 0, 20 , 'UTF-8') ?? '',
             'post_id' => $this->postId,
             'user_id' => $this->userId,
         ];

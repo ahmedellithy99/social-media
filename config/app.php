@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\ServiceProvider;
 
 return [
-
+    'chatset' => 'utf-8', 
     /*
     |--------------------------------------------------------------------------
     | Application Name
