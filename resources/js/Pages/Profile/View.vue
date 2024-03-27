@@ -102,7 +102,7 @@ function resetAvatarImage() {
 }
 
 function submitCoverImage() {
-    imagesForm.post(route("update.image"), {
+    imagesForm.post(route("update.image", props.user.id), {
         onSuccess: (user) => {
             resetCoverImgae();
             setTimeout(() => {
@@ -412,7 +412,7 @@ function chating() {
                                 Photos
                             </TabPanel>
                             <TabPanel v-if="isMyProfile">
-                                <Edit />
+                                <Edit :userId="user.id" />
                             </TabPanel>
                         </TabPanels>
                     </TabGroup>

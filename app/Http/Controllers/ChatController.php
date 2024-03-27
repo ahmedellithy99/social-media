@@ -15,19 +15,14 @@ class ChatController extends Controller
 {
     public function index(Request $request, Chat $chat)
     {
+        $this->authorize('viewAny' , $chat);
         $authUser = auth()->user();
         $authId = $authUser->id;
         // retrieving the Current Chat 
         $chat = $chat->load(['messages', 'UserA', 'UserB']);
-        if (auth()->user()->id == $chat['A']) {
-            $sender = $chat['UserA'];
-            $recipient = $chat['UserB'];
-        } elseif (auth()->user()->id == $chat['B']) {
-            $sender = $chat['UserB'];
-            $recipient = $chat['UserA'];
-        } else {
-            return response('You are not authorized', 403);
-        }
+        //Sender And Recipient
+        $sender = ($authId == $chat['A']) ? $chat['UserA'] : $chat['UserB'];
+        $recipient = ($authId == $chat['B']) ? $chat['UserA'] : $chat['UserB'];
 
         //Notifications for The Authenticated Layout
         $notifications = $authUser->notifications;
@@ -69,11 +64,15 @@ class ChatController extends Controller
 
     public function store(Request $request)
     {
+
         $data = $request->validate([
             'body' => 'required',
             'chat_id' => 'exists:chats,id',
         ]);
-        // return $data['chat_id'];
+        $chat = Chat::findOrFail($data['chat_id']);
+        
+        $this->authorize('create' , $chat );
+
         $message = Message::create([
             'sender_id' => auth()->user()->id,
             'body' => $data['body'],

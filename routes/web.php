@@ -30,13 +30,10 @@ Route::middleware('auth')->group(function () {
     //Profile
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::patch('/profile/{user}', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile/{user}', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::get('u/{user:username}', [ProfileController::class, 'index'])->name('profile');
-    Route::post('/updateImage', [ProfileController::class, 'updateImage'])->name('update.image');
-
-
-
+    Route::post('/updateImage/{user}', [ProfileController::class, 'updateImage'])->name('update.image');
 
     // Post 
     Route::get('/post/{post}', [PostController::class, 'show'])->name('post.show');

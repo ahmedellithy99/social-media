@@ -20,6 +20,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
@@ -136,6 +137,8 @@ class PostController extends Controller
      */
     public function update(UpdatePostRequest $request, Post $post)
     {
+        $this->authorize('update' , $post);
+        
         $user = $request->user();
 
         DB::beginTransaction();
@@ -187,18 +190,16 @@ class PostController extends Controller
      */
     public function destroy(Post $post)
     {
-        if (auth()->user()->id != $post->user->id) {
-            return response("You don't have permission to delete this post", 403);
-        }
+        $this->authorize('delete' , $post);
         try {
             DB::beginTransaction();
 
-            // Perform your database operations here
+            // database operations 
             $post->comments()->delete();
             $post->reactions()->delete();
             $post->delete();
 
-            // If all operations are successful, commit the transaction
+            //  commit the transaction
             DB::commit();
         } catch (\Exception $e) {
             // If any operation fails, rollback the transaction
@@ -274,11 +275,11 @@ class PostController extends Controller
     }
 
     public function deleteComment(Comment $comment)
-    {
+    {   
+        $this->authorize('delete' , $comment);
+        
         $comment->reactions()->delete();
         $comment->delete();
-
-
         return response(200);
     }
 

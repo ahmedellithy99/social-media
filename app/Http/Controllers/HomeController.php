@@ -22,8 +22,6 @@ class HomeController extends Controller
             $authUser = auth()->user();
             $authId = $authUser->id;
 
-
-
             // Sorted Chats for The Authenticated Layout
         $chats = ChatResource::collection(Chat::with('lastMessage')->where('A', $authId)->orWhere('B', $authId)->get());
         $chats = $chats->toArray(request());
@@ -45,39 +43,39 @@ class HomeController extends Controller
             }
         }
 
-            // Notifications 
+        // Notifications 
 
-            $notifications = $authUser->notifications;
-            // Unread Notifications Count
-            $countUnReads = $authUser->unReadNotifications->count();
+        $notifications = $authUser->notifications;
+        // Unread Notifications Count
+        $countUnReads = $authUser->unReadNotifications->count();
 
-            // Posts 
-            $posts = Post::items($authId)
-                ->join('followers AS f', function ($join) use ($authId) {
-                    $join->on('posts.user_id', '=', 'f.user_id')->where('f.follower_id', '=', $authId);
-                })
-                ->latest()->paginate(10);
+        // Posts 
+        $posts = Post::items($authId)
+            ->join('followers AS f', function ($join) use ($authId) {
+                $join->on('posts.user_id', '=', 'f.user_id')->where('f.follower_id', '=', $authId);
+            })
+            ->latest()->paginate(10);
 
-            $posts = PostResource::collection($posts);
+        $posts = PostResource::collection($posts);
 
-            //Followings 
-            $followings =  UserResource::collection(auth()->user()->followings);
+        //Followings 
+        $followings =  UserResource::collection(auth()->user()->followings);
 
-            // Paginating Request 
-            if ($request->wantsJson()) {
-                return $posts;
-            }
-
-            return Inertia::render('Home', [
-                'posts' => $posts,
-                'notifications' => NotificationResource::collection($notifications),
-                'countUnReads' => $countUnReads,
-                'followings' => $followings,
-                'chats' => $chats,
-                'countUnReadChats' => $countUnReadChats
-            ]);
+        // Paginating Request 
+        if ($request->wantsJson()) {
+            return $posts;
         }
 
-        return redirect(route('login'));
+        return Inertia::render('Home', [
+            'posts' => $posts,
+            'notifications' => NotificationResource::collection($notifications),
+            'countUnReads' => $countUnReads,
+            'followings' => $followings,
+            'chats' => $chats,
+            'countUnReadChats' => $countUnReadChats
+        ]);
     }
+
+    return redirect(route('login'));
+    } 
 }

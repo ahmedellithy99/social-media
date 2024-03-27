@@ -9,6 +9,7 @@ defineProps({
     status: {
         type: String,
     },
+    userId: Number,
 });
 </script>
 
@@ -22,6 +23,7 @@ defineProps({
             >
                 <UpdateProfileInformationForm
                     :status="status"
+                    :userId="userId"
                     class="max-w-xl"
                 />
             </div>
@@ -35,7 +37,7 @@ defineProps({
             <div
                 class="p-4 sm:p-8 bg-white dark:bg-gray-800 shadow sm:rounded-lg"
             >
-                <DeleteUserForm class="max-w-xl" />
+                <DeleteUserForm :userId="userId" class="max-w-xl" />
             </div>
         </div>
     </div>

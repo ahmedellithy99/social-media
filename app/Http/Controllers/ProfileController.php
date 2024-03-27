@@ -22,42 +22,42 @@ use Inertia\Response;
 
 class ProfileController extends Controller
 {
-    public function updateImage(Request $request)
+    public function updateImage(Request $request , User $user)
     {
-        $user = $request->user();
-
-
+        $this->authorize('updateImage' , $user);
+        
+        $authUser = $request->user();
         $data = $request->validate(
             [
                 'cover' => 'nullable|image',
                 'avatar' => 'nullable|image'
             ]
         );
-
+        
         $cover = $data['cover'] ?? null;
         $avatar = $data['avatar'] ?? null;
 
         $success = '';
 
         if ($cover) {
-            $path = $cover->storePublicly('user/' . $user->id, 'public');
+            $path = $cover->storePublicly('user/' . $authUser->id, 'public');
 
 
-            if ($user->cover_path) {
-                Storage::disk('public')->delete($user->cover_path);
+            if ($authUser->cover_path) {
+                Storage::disk('public')->delete($authUser->cover_path);
             }
 
-            $user->update(['cover_path' => $path]);
+            $authUser->update(['cover_path' => $path]);
 
             $success = 'Your cover image was updated';
         }
 
         if ($avatar) {
-            if ($user->avatar_path) {
-                Storage::disk('public')->delete($user->avatar_path);
+            if ($authUser->avatar_path) {
+                Storage::disk('public')->delete($authUser->avatar_path);
             }
-            $path = $avatar->store('user/' . $user->id, 'public');
-            $user->update(['avatar_path' => $path]);
+            $path = $avatar->store('user/' . $authUser->id, 'public');
+            $authUser->update(['avatar_path' => $path]);
             $success = 'Your avatar image was updated';
         }
 
@@ -65,15 +65,12 @@ class ProfileController extends Controller
     }
 
     public function index(Request $request, User $user)
-    {
+    {   
         $authUser = auth()->user();
         $authId = $authUser->id;
 
         $isFollowing = false;
         // Authenticated Users Only 
-        if (Auth::guest()) {
-            return redirect(route('login'));
-        }
         if (auth()->user()->id != $user->id) {
 
             $isFollowing = Follower::where('user_id', $user->id)->where('follower_id', $authId)->exists();
@@ -148,8 +145,9 @@ class ProfileController extends Controller
     /**
      * Update the user's profile information.
      */
-    public function update(ProfileUpdateRequest $request): RedirectResponse
-    {
+    public function update(ProfileUpdateRequest $request, User $user): RedirectResponse
+    {   
+        $this->authorize('update' , $user);
         $userReq = $request->user()->fill($request->validated());
 
         if ($request->user()->isDirty('email')) {
@@ -164,8 +162,10 @@ class ProfileController extends Controller
     /**
      * Delete the user's account.
      */
-    public function destroy(Request $request): RedirectResponse
+    public function destroy(Request $request , User $user): RedirectResponse
     {
+        $this->authorize('delete' , $user);
+        
         $request->validate([
             'password' => ['required', 'current_password'],
         ]);
